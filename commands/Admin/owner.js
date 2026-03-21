@@ -1,41 +1,39 @@
 export default {
-  name: 'المطور', // اسم الأمر
-  author: 'حسين يعقوبي', // مؤلف الأمر
-  role: 'member', // الدور المطلوب لاستخدام الأمر
-  description: 'يعرض معلومات وجهة اتصال المطور.', // وصف الأمر
-  aliases: ['مطور', 'المالك'],
+  name: 'المطور', 
+  author: 'AbuUbaida', 
+  role: 'member', 
+  description: 'يعرض معلومات وجهة اتصال المطور الخاص بالبوت.', 
+  aliases: ['مطور', 'ابوكي', 'معلومات'],
   async execute({ api, event }) {
     try {
       const ownerInfo = {
-        name: 'مــاهــر',
+        name: 'أبـو عـبـيـدة (سـيـنـكـو)',
         gender: 'ذكر',
-        age: '19',
-        country: 'لــيــبــيــا 🇱🇾',
-        height: '180',
-        facebookLink: 'https://www.facebook.com/MAHER.FOKS',
-        nick: 'الــثــعــلــب 🦊',
+        age: '17',
+        country: 'الـسـودان 🇸🇩',
+        facebookLink: 'https://www.facebook.com/profile.php?id=61588108307572',
+        nick: 'S I N K O ⚡',
       };
 
-      const ownerContactID = '61550232547706'; // معرّف المطور
+      const ownerContactID = '61588108307572'; // معرف حسابك الشخصي
 
-      // رسالة المعلومات حول المطور
-      const message = `࿇ ══━━━✥◈✥━━━══ ࿇
-      •——[معلومات حول المالك]——•
-      ❏ الاسم: 『${ownerInfo.name}』
-      ❏ الجنس: 『${ownerInfo.gender}』
-      ❏ العمر: 『${ownerInfo.age}』
-      ❏ البلد: 『${ownerInfo.country}』
-      ❏ الطول: 『${ownerInfo.height}』 سم
-      ❏ رابط الفيسبوك: 『${ownerInfo.facebookLink}』
-      ❏ اللقب:『${ownerInfo.nick}』\n ࿇ ══━━━✥◈✥━━━══ ࿇`;
+      // رسالة المعلومات بتنسيق فخم
+      const message = `♢ ═════════════════ ♢
+      •———[ مـعـلـومـات الـمـالـك ]———•
+      ❏ الاسـم: 『${ownerInfo.name}』
+      ❏ الـعـمـر: 『${ownerInfo.age}』 سـنـة
+      ❏ الـبـلـد: 『${ownerInfo.country}』
+      ❏ الـلـقـب: 『${ownerInfo.nick}』
+      ❏ الـرابـط: 『${ownerInfo.facebookLink}』
+♢ ═════════════════ ♢`;
 
       // إرسال رسالة المعلومات
       await api.sendMessage(message, event.threadID);
 
-      // مشاركة جهة الاتصال الخاصة بالمطور
+      // مشاركة جهة الاتصال الخاصة بك
       await api.shareContact(ownerContactID, ownerContactID, event.threadID);
 
-      // إضافة تفاعل مع الرسالة كإشارة على النجاح
+      // إضافة تفاعل صاروخ للتميز
       api.setMessageReaction('🚀', event.messageID, (err) => {}, true);
     } catch (error) {
       console.error('حدث خطأ أثناء تنفيذ الأمر:', error);
