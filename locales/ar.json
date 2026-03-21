@@ -1,0 +1,27 @@
+{
+  "errors": {
+    "banned_user": "❌ | أنت محظور من إستخدام البوت بسبب: {reason}",
+    "banned_thread": "❌ | هذه المجموعة محظورة بسبب: {reason}",
+    "cooldown": "⏱️ | يرجى الانتظار {time} ثانية قبل استخدام الأمر مرة أخرى",
+    "no_permission": "🚫 | ليس لديك الصلاحية لإستخدام هذا الأمر",
+    "command_not_found": "❌ | الأمر غير موجود",
+    "execution_failed": "❌ | حدث خطأ أثناء تنفيذ الأمر",
+    "reply_not_found": "تعذر العثور على الأمر لتنفيذ الرد"
+  },
+  "messages": {
+    "bot_running": "البوت يعمل بنجاح!",
+    "bot_started": "البوت يعمل الآن!",
+    "command_loaded": "تم تحميل الأمر بنجاح",
+    "event_loaded": "تم تحميل الحدث بنجاح",
+    "total_commands": "إجمالي الأوامر",
+    "total_events": "إجمالي الأحداث"
+  },
+  "help": {
+    "title": "📚 قائمة أوامر البوت",
+    "developer": "المطور",
+    "prefix": "البادئة",
+    "category": "الفئة",
+    "commands": "الأوامر",
+    "love_message": "أحبكم يا سنافري ❤️"
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "name": "snfor",
+  "version": "1.0.1",
+  "description": "بوت snfor - أحبكم يا سنافري ❤️ | المطور: حمودي سان 🇸🇩 | فيسبوك: https://www.facebook.com/babasnfor80",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node .",
+    "dev": "nodemon .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "حمودي سان 🇸🇩",
+  "license": "ISC",
+  "keywords": [
+    "bot",
+    "facebook",
+    "snfor",
+    "hamoudi",
+    "chatbot"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hamoudisan/snfor-bot.git"
+  },
+  "dependencies": {
+    "@xaviabot/fb-downloader": "^1.0.14",
+    "axios": "^1.7.7",
+    "blessed": "^0.1.81",
+    "bluebird": "^3.7.2",
+    "chalk": "^5.3.0",
+    "cheerio": "^1.0.0-rc.12",
+    "chokidar": "^3.5.3",
+    "cli-table3": "^0.6.3",
+    "express": "^4.18.2",
+    "figlet": "^1.6.0",
+    "form-data": "^4.0.0",
+    "fs-extra": "^11.1.1",
+    "gradient-string": "^2.0.2",
+    "jimp": "^0.22.12",
+    "moment-timezone": "^0.6.0",
+    "mongoose": "^9.3.1",
+    "node-fetch": "^3.3.2",
+    "pastebin-js": "^1.0.6",
+    "semver": "^7.7.3",
+    "srod-v2": "^1.0.2",
+    "tinyurl": "^1.1.7",
+    "weather-js": "^2.0.0",
+    "ws3-fca": "^2.0.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
