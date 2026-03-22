@@ -1,6 +1,6 @@
 // KaguyaSetUp/config.js
 export default {
-    prefix: "/",
+    prefix: "*",
     BOT_NAME: "snfor",
     ADMIN_IDS: ["61588108307572", "61588108307572"], // ✅ المطورين
     botEnabled: true,
