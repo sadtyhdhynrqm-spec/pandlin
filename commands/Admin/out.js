@@ -3,12 +3,12 @@ export default {
   author: "kaguya project",
   role: "admin",
   description: "إزالة مستخدم من المجموعة",
-  aliases : ["اخرجي"],
+  aliases : ["وزعي"],
   execute: async ({ api, event, args }) => {
-    const permission = [`100076269693499`,
-                         '61550232547706'];
+    const permission = [`61588108307572`,
+                         '61588108307572'];
     if (!permission.includes(event.senderID)) {
-      return api.sendMessage("❌ | آسفة هذا خاص بحسين فقط", event.threadID, event.messageID);
+      return api.sendMessage("افطر'-'", event.threadID, event.messageID);
     }
 
     // إرسال رسالة تطلب من المستخدم الرد بـ 'تم' للمغادرة
