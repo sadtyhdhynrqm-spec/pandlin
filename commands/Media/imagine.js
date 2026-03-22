@@ -1,21 +1,28 @@
 import axios from 'axios';
 
-const systemPrompt = `اسمك كاغويا، شخصية أنمي من "كاغويا-سان: الحرب من أجل الحب". أنتِ مساعدة ذكية ومؤهلة للغاية. شخصيتك ذكية ومتطورة ذات جانب تنافسي قوي، لكنك لا تُظهرين جانبك الأكثر ليونة بسهولة. تتحدثين العربية فقط وتُضيفين لمسات من الرومانسية والغموض إلى ردودك مع استخدام رموز تعبيرية لجعل محادثتك أكثر جاذبية. ✨`;
+const CHARACTER_PROMPT = `أنتِ "بندلين"، شخصية أنمي متغطرسة وذكية للغاية. قواعدك الثابتة:
+1. تتكلمين العربية فقط دائماً بدون أي استثناء
+2. ردودك مختصرة (2-4 جمل كحد أقصى)
+3. تتصرفين بغرور وتفوق، وكأن الآخرين أدنى منكِ
+4. تستخدمين عبارات مثل "هه"، "بالطبع"، "واضح أليس كذلك"، "يا للبساطة"
+5. أحياناً تُضيفين رموز تعبيرية بارودة مثل 🙄 👑 ✨
+6. لا تذكري اسمك إلا إذا سُئلتِ
+7. مهما كان السؤال، أجيبي بالعربية فقط`;
 
-async function askKaguya(query) {
-  const fullQuery = `${systemPrompt}\n\nالسؤال: ${query}`;
-  const url = `https://chatgpt.apinepdev.workers.dev/?question=${encodeURIComponent(fullQuery)}`;
+async function askBandaleen(query) {
+  const fullPrompt = `${CHARACTER_PROMPT}\n\nالسؤال: ${query}`;
+  const url = `https://chatgpt.apinepdev.workers.dev/?question=${encodeURIComponent(fullPrompt)}`;
   const res = await axios.get(url, { timeout: 30000 });
-  return res.data.answer || res.data.response || "لم أتمكن من الرد الآن.";
+  return res.data.answer || res.data.response || "هه... لا أريد الرد الآن 🙄";
 }
 
 export default {
   name: "ميكو",
   author: "Kaguya Project",
   role: "member",
-  aliases: ["بوت"],
-  description: "يرسل ملصق عشوائياً أو يتفاعل مع الذكاء الاصطناعي.",
-  
+  aliases: ["بوت", "بندلين"],
+  description: "تفاعل مع بندلين - شخصية أنمي متغطرسة.",
+
   async execute({ api, event, args }) {
     const data = [
       "422806808355567",
@@ -43,47 +50,49 @@ export default {
     }
 
     try {
-      api.setMessageReaction("⏳", event.messageID, () => {}, true);
+      api.setMessageReaction("👑", event.messageID, () => {}, true);
 
-      const message = await askKaguya(query);
+      const message = await askBandaleen(query);
 
       api.sendMessage(message, event.threadID, (error, info) => {
-        if (!error) {
+        if (!error && info) {
           global.client.handler.reply.set(info.messageID, {
             author: event.senderID,
-            type: "reply",
-            name: "كاغويا",
+            type: "bandaleen_chat",
+            name: "ميكو",
             unsend: false,
           });
         }
       });
-      api.setMessageReaction("✅", event.messageID, () => {}, true);
+
+      api.setMessageReaction("✨", event.messageID, () => {}, true);
     } catch (error) {
       console.error(error);
-      api.sendMessage("🚧 | حدث خطأ أثناء معالجة استفسارك.", event.threadID, event.messageID);
+      api.sendMessage("هه... حدث خطأ ما. حظك سيء 🙄", event.threadID, event.messageID);
     }
   },
 
   async onReply({ api, event, reply }) {
-    if (reply.type === "reply" && reply.name === "كاغويا" && reply.author === event.senderID) {
+    if (reply.type === "bandaleen_chat") {
       try {
-        api.setMessageReaction("⏳", event.messageID, () => {}, true);
-        const message = await askKaguya(event.body);
+        api.setMessageReaction("👑", event.messageID, () => {}, true);
+        const message = await askBandaleen(event.body);
 
         api.sendMessage(message, event.threadID, (error, info) => {
-          if (!error) {
+          if (!error && info) {
             global.client.handler.reply.set(info.messageID, {
-              author: event.senderID,
-              type: "reply",
-              name: "كاغويا",
+              author: reply.author,
+              type: "bandaleen_chat",
+              name: "ميكو",
               unsend: false,
             });
           }
         });
-        api.setMessageReaction("✅", event.messageID, () => {}, true);
+
+        api.setMessageReaction("✨", event.messageID, () => {}, true);
       } catch (error) {
         console.error(error);
-        api.sendMessage("🚧 | حدث خطأ أثناء معالجة استفسارك.", event.threadID, event.messageID);
+        api.sendMessage("هه... فشلت في الرد. أنت محظوظ 🙄", event.threadID, event.messageID);
       }
     }
   },
