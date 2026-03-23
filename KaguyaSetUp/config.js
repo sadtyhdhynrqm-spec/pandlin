@@ -1,7 +1,7 @@
 // KaguyaSetUp/config.js
 export default {
-    prefix: "",
-    BOT_NAME: "snfor",
+    prefix: "*",
+    BOT_NAME: "بندلين",
     ADMIN_IDS: ["61588108307572", "61588108307572"], // ✅ المطورين
     botEnabled: true,
     autogreet: true,
