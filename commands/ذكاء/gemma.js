@@ -3,73 +3,36 @@ import tinyurl from "tinyurl";
 import fs from "fs";
 import path from "path";
 
-
 export default {
   name: "ارت",
-  author: "حسين يعقوبي",
+  author: "سينكو 𓆩☆𓆪",
   role: "member",
-  description: "تحويل الصورة الى أنمي باستخدام الذكاء الاصطناعي",
-  aliases:["art"],
+  description: "تحويل الصورة إلى أنمي بالذكاء الاصطناعي",
+  aliases: ["art", "anime_art"],
   execute: async ({ api, event, args }) => {
-    const text = args.join(" ");
-
-    if (!event.messageReply || !event.messageReply.attachments || !event.messageReply.attachments[0]) {
-      return api.sendMessage("❌ | من فضلك قم بالرد على صورة.", event.threadID, event.messageID);
+    if (!event.messageReply?.attachments?.[0]) {
+      return api.sendMessage("✧══════•❁◈❁•══════✧\n✺ ┇ ⚠️ رد على صورة تريد تحويلها\n✧══════•❁◈❁•══════✧", event.threadID, event.messageID);
     }
-
     const imgurl = encodeURIComponent(event.messageReply.attachments[0].url);
     api.setMessageReaction("⏰", event.messageID, () => {}, true);
-
     const lado = `https://xapiz.onrender.com/i2art?url=${imgurl}`;
-
-    // تحديد المسار لحفظ الملف داخل مجلد cache
     const cacheDir = path.join(process.cwd(), "cache");
     const filePath = path.join(cacheDir, `art_${event.senderID}_${Date.now()}.png`);
-
     try {
-      // الحصول على الرابط المختصر
-      const shortUrl = await tinyurl.shorten(lado);
-
-      // الطلب لجلب الصورة الفنية الناتجة وحفظها في cache
-      const response = await axios({
-        url: lado,
-        method: "GET",
-        responseType: "stream"
-      });
-
-      // التأكد من وجود مجلد cache
-      if (!fs.existsSync(cacheDir)) {
-        fs.mkdirSync(cacheDir, { recursive: true });
-      }
-
-      // حفظ الصورة الناتجة في ملف محلي داخل cache
+      if (!fs.existsSync(cacheDir)) fs.mkdirSync(cacheDir, { recursive: true });
+      const response = await axios({ url: lado, method: "GET", responseType: "stream" });
       const writer = fs.createWriteStream(filePath);
       response.data.pipe(writer);
-
-      // انتظار انتهاء عملية الكتابة
       writer.on("finish", () => {
-        // إرسال رسالة تأكيد التوليد مع الصورة والرابط المختصر
+        api.setMessageReaction("✅", event.messageID, () => {}, true);
         api.sendMessage({
-          body: `❍───────────────❍\n🎨 | 𝐷𝑂𝑁𝐸 𝑆𝑈𝐶𝐶𝐸𝑆𝑆𝐹𝑈𝐿𝐿𝑌 \n🔗 | link :${shortUrl} \n❍───────────────❍',
-        `,
+          body: `✧══════•❁◈❁•══════✧\n✺ ┇\n✺ ┇ ⏣ ⟬ الـفـن الـرقـمـي ⟭\n✺ ┇\n✺ ┇ ✅ تم تحويل صورتك إلى أنمي\n✺ ┇\n✧══════•❁◈❁•══════✧`,
           attachment: fs.createReadStream(filePath)
-        }, event.threadID, () => {
-          // إضافة علامة نجاح التوليد
-          api.setMessageReaction("✅", event.messageID, () => {}, true);
-
-          // حذف الملف بعد إرساله
-          fs.unlinkSync(filePath);
-        });
+        }, event.threadID, () => { try { fs.unlinkSync(filePath); } catch (e) {} }, event.messageID);
       });
-
-      writer.on("error", (err) => {
-        console.error("Error writing file:", err);
-        api.sendMessage("❌ | فشل في حفظ الملف.", event.threadID, event.messageID);
-      });
+      writer.on("error", () => api.sendMessage("✧══════•❁◈❁•══════✧\n✺ ┇ ❌ فشل في حفظ الصورة\n✧══════•❁◈❁•══════✧", event.threadID));
     } catch (error) {
-      // التعامل مع الخطأ في حالة فشل التوليد
-      api.sendMessage("❌ | فشل في توليد الفن، الرجاء المحاولة مرة أخرى.", event.threadID, event.messageID);
-      console.error("Error generating art:", error);
+      api.sendMessage("✧══════•❁◈❁•══════✧\n✺ ┇ ❌ فشل في التحويل، أعد المحاولة\n✧══════•❁◈❁•══════✧", event.threadID, event.messageID);
     }
   }
 };

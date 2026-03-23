@@ -56,7 +56,7 @@ export default {
             const userInfo = await api.getUserInfo(parseInt(uid));
 
             if (!userInfo[uid]) {
-                api.sendMessage(`⚠️ | قم بعمل منشن للشخص ما.`, event.threadID, event.messageID);
+                api.sendMessage("✧══════•❁◈❁•══════✧\n✺ ┇ ⚠️ اعمل منشن للشخص\n✧══════•❁◈❁•══════✧", event.threadID, event.messageID);
                 return;
             }
 
@@ -83,7 +83,7 @@ export default {
             // تصنيف المستخدم باستخدام عدد الرسائل
             const rank = getRank(userMessageCount);
 
-            const message = `•—————[مـعـلـومـات]—————•\n\n✨ مــﻋــڷــﯡمــاٺ ؏ــن : 『${firstName}』\n❏👤 إسـمـك: 『${name}』\n❏♋ جـنـسـيـتـك : 『${gender === 1 ? "أنثى" : "ذكر"}』\n❏💰 رصـيـدك :『${money}』 دولار\n❏🎖️نـقـاطـك : 『${userPoints}』 نقطة\n❏📩 رسـائـلـك : 『${userMessageCount}』\n❏🧿 تـصـنـيـفـك : 『${rank}』\n•—————[مـعـلـومـات]—————•`;
+            const message = `✧══════•❁◈❁•══════✧\n✺ ┇\n✺ ┇ ⏣ ⟬ مـعـلـومـات الـعـضـو ⟭\n✺ ┇\n✺ ┇ 👤 الاسم: 『${name}』\n✺ ┇ ♋ الجنس: 『${gender === 1 ? "أنثى" : "ذكر"}』\n✺ ┇ 💰 الرصيد: 『${money}』 دولار\n✺ ┇ 🎖️ النقاط: 『${userPoints}』\n✺ ┇ 📩 الرسائل: 『${userMessageCount}』\n✺ ┇ 🧿 التصنيف: 『${rank}』\n✺ ┇\n✧══════•❁◈❁•══════✧`;
 
             api.sendMessage({
                 body: message,
@@ -92,7 +92,7 @@ export default {
 
         } catch (err) {
             console.error('Error:', err);
-            api.sendMessage('❌ | حدث خطأ أثناء جلب المعلومات. الرجاء معاودة المحاولة في وقت لاحق.', event.threadID, event.messageID);
+            api.sendMessage('✧══════•❁◈❁•══════✧\n✺ ┇ ❌ حدث خطأ أثناء جلب المعلومات\n✧══════•❁◈❁•══════✧', event.threadID, event.messageID);
         }
     }
 };

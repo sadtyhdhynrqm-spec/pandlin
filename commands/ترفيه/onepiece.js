@@ -56,16 +56,17 @@ const userMoney = (await Economy.getBalance(event.senderID)).data;
 
       const cost = 1000;
       if (userMoney < cost) {
-        return api.sendMessage(`⚠️ | لا يوجد لديك رصيد كافٍ. يجب عليك الحصول على ${cost} دولار من اجل الحصول على eyecatcher لشخصية لكل واحدة`, event.threadID);
+        return api.sendMessage(`✧══════•❁◈❁•══════✧\n✺ ┇ ⚠️ رصيدك غير كافٍ\n✺ ┇ تحتاج: ${cost} دولار\n✧══════•❁◈❁•══════✧`, event.threadID);
       }
 
       // الخصم من الرصيد
       await Economy.decrease(cost, event.senderID);
 
-    let message = "✿━━━━━━━━━━━━━━━━✿\nقم بالرد برقم الشخصية من اجل الحصول على eyecatcher الخاصة بها:\n✿━━━━━━━━━━━━━━━━✿";
+    let message = "✧══════•❁◈❁•══════✧\n✺ ┇ ⏣ ⟬ شخصيات ون بيس ⟭\n✺ ┇\n✺ ┇ رد برقم الشخصية:\n✺ ┇";
     for (const [key, value] of Object.entries(videoLinks)) {
-        message += `┣${key} ☛ ━━⦿〘${value.name}〙\n`;
+        message += `\n✺ ┇ ${key}. ${value.name}`;
     }
+    message += "\n✺ ┇\n✧══════•❁◈❁•══════✧";
 
     const sentMessage = await api.sendMessage(message, event.threadID, (err, info) => {
         global.client.handler.reply.set(info.messageID, {
@@ -96,7 +97,7 @@ async function sendVideoClip({ api, event, reply }) {
         api.setMessageReaction("✅", event.messageID, (err) => {}, true);
 
         await api.sendMessage({
-            body: `࿇ ══━━━✥◈✥━━━══ ࿇\nإليك ال eyecatcher الخاصة بشخصية ${name}\n࿇ ══━━━✥◈✥━━━══ ࿇`,
+            body: `✧══════•❁◈❁•══════✧\n✺ ┇\n✺ ┇ ⏣ ⟬ ون بيس ⟭\n✺ ┇\n✺ ┇ 🎬 شخصية: ${name}\n✺ ┇\n✧══════•❁◈❁•══════✧`,
             attachment: fs.createReadStream(tempVideoPath),
         }, event.threadID);
 

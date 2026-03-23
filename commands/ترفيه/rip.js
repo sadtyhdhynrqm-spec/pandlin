@@ -25,13 +25,14 @@ export default {
     execute: async ({ api, event, args }) => {
         const senderID = event.messageReply?.senderID || event.senderID;
         const mention = Object.keys(event.mentions);
-        if (mention.length == 0) return api.sendMessage(" ⚠️ |المرجو عمل منشن للشخص اللذي تريد ان يكون وجهه في المرحاض", event.threadID, event.messageID);
-        else if (mention.length == 1) {
-            const one = senderID, two = mention[0];
-            bal(one, two).then(ptth => { api.sendMessage({ body :"أنت تستحق هذا المكان يا وجه المرحاض 🤣", attachment: fs.createReadStream(ptth) }, event.threadID); });
-        } else {
-            const one = mention[1], two = mention[0];
-            bal(one, two).then(ptth => { api.sendMessage({ body: "أنت تستحق هذا المكان يا وجه المرحاض 🤣", attachment: fs.createReadStream(ptth) }, event.threadID); });
-        }
+        if (mention.length == 0) return api.sendMessage("✧══════•❁◈❁•══════✧\n✺ ┇ ⚠️ اعمل منشن للشخص\n✧══════•❁◈❁•══════✧", event.threadID, event.messageID);
+        const one = mention.length >= 2 ? mention[1] : senderID;
+        const two = mention[0];
+        bal(one, two).then(ptth => {
+          api.sendMessage({
+            body: `✧══════•❁◈❁•══════✧\n✺ ┇\n✺ ┇ ⏣ ⟬ المـرحـاض ⟭\n✺ ┇\n✺ ┇ 🤣 أنت تستحق هذا المكان!\n✺ ┇\n✧══════•❁◈❁•══════✧`,
+            attachment: fs.createReadStream(ptth)
+          }, event.threadID, () => { try { fs.unlinkSync(ptth); } catch(e) {} });
+        }).catch(() => api.sendMessage("✧══════•❁◈❁•══════✧\n✺ ┇ ❌ حدث خطأ\n✧══════•❁◈❁•══════✧", event.threadID));
     }
 };

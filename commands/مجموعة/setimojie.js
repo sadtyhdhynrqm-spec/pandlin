@@ -1,25 +1,24 @@
 import fs from "fs";
 const emojiJSON = JSON.parse(fs.readFileSync("./cache12/emoji/emoji.json", "utf-8"));
 
-class setimg {
-  name = "ضبط_إيموجي";
-  author = "Kaguya Project";
-  cooldowns = 60;
-  descriptions = "تغيير إيموجي المجموعة";
-  role = "admin";
-  aliases = [];
+export default {
+  name: "ضبط_إيموجي",
+  author: "سينكو 𓆩☆𓆪",
+  cooldowns: 60,
+  description: "تغيير إيموجي المجموعة",
+  role: "admin",
+  aliases: ["setemoji"],
 
   async execute({ api, event, args }) {
     try {
-      var [emoji] = args;
-      if (!emojiJSON.includes(emoji)) {
-        return kaguya.reply(" ⚠️ |الرجاء إدخال إيموجي صالح !")
+      const [emoji] = args;
+      if (!emoji || !emojiJSON.includes(emoji)) {
+        return api.sendMessage("✧══════•❁◈❁•══════✧\n✺ ┇ ⚠️ أدخل إيموجي صالح\n✺ ┇ مثال: ضبط_إيموجي 🌸\n✧══════•❁◈❁•══════✧", event.threadID, event.messageID);
       }
-      await api.changeThreadEmoji(emoji, event.threadID, event.messagaID);
+      await api.changeThreadEmoji(emoji, event.threadID);
+      api.sendMessage(`✧══════•❁◈❁•══════✧\n✺ ┇ ✅ تم تغيير إيموجي المجموعة إلى ${emoji}\n✧══════•❁◈❁•══════✧`, event.threadID, event.messageID);
     } catch (err) {
-      console.log(err);
+      api.sendMessage("✧══════•❁◈❁•══════✧\n✺ ┇ ❌ حدث خطأ أثناء التغيير\n✧══════•❁◈❁•══════✧", event.threadID, event.messageID);
     }
   }
-}
-
-export default new setimg();
+};

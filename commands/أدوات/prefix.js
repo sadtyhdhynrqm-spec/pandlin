@@ -4,53 +4,35 @@ import axios from "axios";
 
 export default {
   name: "الرمز",
-  author: "Thiệu Trung Kiên",
-  cooldowns: 60,
-  description: "عرض أو تعديل بادئة المجموعة",
+  author: "سينكو 𓆩☆𓆪",
+  cooldowns: 30,
+  description: "عرض بادئة المجموعة",
   role: "member",
-  aliases: ["prefix", "Prefix", "البادئة"],
+  aliases: ["prefix", "البادئة"],
   execute: async ({ event, api }) => {
-    
-    api.setMessageReaction("❓", event.messageID, (err) => {}, true);
-  
-    // رسالة "لا توجد أي بادئة" مع مرفق GIF سيتم إرسالها مباشرة
-    const noPrefixMessage = "🧭 | ᴛʜᴇʀᴇ ɪѕ ɴᴏ ᴘʀᴇғɪх";
-    const videoLink = 'https://i.ibb.co/T2SV06R/download.gif'; // الرابط الخاص بالـ GIF
+    api.setMessageReaction("❓", event.messageID, () => {}, true);
+    const prefix = global.client?.config?.prefix || "*";
+    const msg = `✧══════•❁◈❁•══════✧
+✺ ┇
+✺ ┇ ⏣ ⟬ بـادئـة الـبـوت ⟭
+✺ ┇
+✺ ┇ ◍ البادئة الحالية: 『 ${prefix} 』
+✺ ┇
+✺ ┇ ⠇استخدمها قبل أي أمر
+✺ ┇
+✧══════•❁◈❁•══════✧`;
 
-    // مسار مجلد مؤقت لتخزين الصورة المتحركة
+    const videoLink = 'https://i.ibb.co/T2SV06R/download.gif';
     const tmpFolderPath = path.join(process.cwd(), 'tmp');
-
-    // إنشاء المجلد إذا لم يكن موجودًا
-    if (!fs.existsSync(tmpFolderPath)) {
-      fs.mkdirSync(tmpFolderPath);
-    }
-
-    // مسار تخزين الـ GIF محليًا
-    const gifPath = path.join(tmpFolderPath, 'owner_video.gif');
+    if (!fs.existsSync(tmpFolderPath)) fs.mkdirSync(tmpFolderPath);
+    const gifPath = path.join(tmpFolderPath, 'prefix.gif');
 
     try {
-      // جلب الـ GIF من الرابط وحفظه
       const gifResponse = await axios.get(videoLink, { responseType: 'arraybuffer' });
       fs.writeFileSync(gifPath, Buffer.from(gifResponse.data, 'binary'));
-
-      // إرسال الرسالة مع الـ GIF
-      await sendNoPrefixMessage(api, event.threadID, noPrefixMessage, gifPath);
-    } catch (error) {
-      console.error("Error fetching and sending GIF:", error);
-      api.sendMessage("❌ | حدث خطأ أثناء تحميل أو إرسال ملف الـ GIF.", event.threadID);
+      await api.sendMessage({ body: msg, attachment: fs.createReadStream(gifPath) }, event.threadID, event.messageID);
+    } catch {
+      await api.sendMessage(msg, event.threadID, event.messageID);
     }
   },
 };
-
-// دالة إرسال رسالة مع GIF
-async function sendNoPrefixMessage(api, threadID, message, attachmentPath) {
-  try {
-    // إرسال الرسالة مع ملف الـ GIF
-    await api.sendMessage({
-      body: message,
-      attachment: fs.createReadStream(attachmentPath),
-    }, threadID);
-  } catch (error) {
-    console.error("Error sending no prefix message:", error);
-  }
-}

@@ -53,7 +53,7 @@ export default {
         const targetUserId = mentions.length > 0 ? mentions[0] : (repliedUserId || event.senderID);
 
         if (!targetUserId) {
-            return api.sendMessage("⚠️ | الرجاء عمل منشن أو الرد على رسالة.", event.threadID, event.messageID);
+            return api.sendMessage("✧══════•❁◈❁•══════✧\n✺ ┇ ⚠️ اعمل منشن أو رد على رسالة\n✧══════•❁◈❁•══════✧", event.threadID, event.messageID);
         }
 
         const userOneId = event.senderID;
@@ -62,12 +62,12 @@ export default {
         try {
             const imagePath = await generateImage(userOneId, userTwoId);
             api.sendMessage({
-                body: "",
+                body: `✧══════•❁◈❁•══════✧\n✺ ┇\n✺ ┇ ⏣ ⟬ الـصـفـعـة ⟭\n✺ ┇\n✺ ┇ 👋 تلقى صفعة قوية!\n✺ ┇\n✧══════•❁◈❁•══════✧`,
                 attachment: fs.createReadStream(imagePath)
-            }, event.threadID, () => fs.unlinkSync(imagePath), event.messageID);
+            }, event.threadID, () => { try { fs.unlinkSync(imagePath); } catch(e){} }, event.messageID);
         } catch (error) {
             console.error(error);
-            api.sendMessage("🚧 | حدث خطأ أثناء معالجة طلبك.", event.threadID, event.messageID);
+            api.sendMessage("✧══════•❁◈❁•══════✧\n✺ ┇ ❌ حدث خطأ أثناء المعالجة\n✧══════•❁◈❁•══════✧", event.threadID, event.messageID);
         }
     }
 };

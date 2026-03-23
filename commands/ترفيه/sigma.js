@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path";
 
 async function sendRandomAudioClip({ api, event }) {
-    const sentMessage = await api.sendMessage("⏱️ |يرجى الإنتظار....", event.threadID);
+    const sentMessage = await api.sendMessage("✧══════•❁◈❁•══════✧\n✺ ┇ ⏱️ جاري التحميل...\n✧══════•❁◈❁•══════✧", event.threadID);
 
     try {
         const audioLinks = [
@@ -49,7 +49,7 @@ async function sendRandomAudioClip({ api, event }) {
 api.setMessageReaction("✅", event.messageID, (err) => {}, true);
 
                   await api.sendMessage({
-                      body: '࿇ ══━━━━✥◈✥━━━━══ ࿇\nتفضل مقطع السيجما 🧿\t\t\t\n࿇ ══━━━━✥◈✥━━━━══ ࿇',
+                      body: `✧══════•❁◈❁•══════✧\n✺ ┇\n✺ ┇ ⏣ ⟬ مـقـطـع الـسـيـجـمـا ⟭\n✺ ┇\n✺ ┇ 🧿 تفضل المقطع\n✺ ┇\n✧══════•❁◈❁•══════✧`,
                       attachment: fs.createReadStream(tempAudioPath),
                   }, event.threadID);
 

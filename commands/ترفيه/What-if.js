@@ -45,7 +45,7 @@ export default {
     const input = args.join(" ");
 
     if (!input.includes("|")) {
-      api.sendMessage("❌ | يرجى استخدام الصيغة الصحيحة، مثل: ماذا-لو حسين | وليد", event.threadID);
+      api.sendMessage("✧══════•❁◈❁•══════✧\n✺ ┇ ⚠️ الصيغة الصحيحة:\n✺ ┇ ماذ-لو اسم1 | اسم2\n✧══════•❁◈❁•══════✧", event.threadID, event.messageID);
       return;
     }
 
@@ -62,6 +62,6 @@ export default {
       return;
     }
 
-    api.sendMessage(msg, event.threadID, event.messageID);
+    api.sendMessage(`✧══════•❁◈❁•══════✧\n✺ ┇\n✺ ┇ ⏣ ⟬ مـاذا لـو ⟭\n✺ ┇\n✺ ┇ ${msg}\n✺ ┇\n✧══════•❁◈❁•══════✧`, event.threadID, event.messageID);
   }
 };

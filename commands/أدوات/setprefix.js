@@ -2,31 +2,34 @@ import fs from "fs";
 
 export default {
   name: "حقيقة&جرأة",
-  author: "Hussein Yacoubi",
+  author: "سينكو 𓆩☆𓆪",
   role: "member",
-  description: "يُطرح على المستخدمين سؤال حقيقة أو تحدي (جرأة) بشكل عشوائي.",
+  description: "لعبة حقيقة أم جرأة",
+  aliases: ["truth", "dare"],
   async execute({ api, args, event }) {
     const [arg1] = args;
 
     if (!arg1) {
-      api.sendMessage("إذا كنت تريد لعب حقيقة أم جرأة، يرجى استخدام 'حقيقة&جرأة حقيقة' أو 'حقيقة&جرأة جرأة'.", event.threadID || event.senderID);
-      return;
+      return api.sendMessage(`✧══════•❁◈❁•══════✧
+✺ ┇
+✺ ┇ ⏣ ⟬ حـقـيـقـة أم جـرأة ⟭
+✺ ┇
+✺ ┇ ◍ حقيقة&جرأة حقيقة
+✺ ┇ ◍ حقيقة&جرأة جرأة
+✺ ┇
+✧══════•❁◈❁•══════✧`, event.threadID, event.messageID);
     }
 
-    if (arg1.toLowerCase() === 'حقيقة') {
+    if (arg1 === 'حقيقة') {
       const truthQuestions = JSON.parse(fs.readFileSync(`TRUTHQN.json`));
-      const randomIndex = Math.floor(Math.random() * truthQuestions.length);
-      const randomQuestion = truthQuestions[randomIndex];
-
-      api.sendMessage(`هاهو سؤال الحقيقة: \n${randomQuestion}`, event.threadID || event.senderID);
-    } else if (arg1.toLowerCase() === 'جرأة') {
+      const randomQuestion = truthQuestions[Math.floor(Math.random() * truthQuestions.length)];
+      api.sendMessage(`✧══════•❁◈❁•══════✧\n✺ ┇\n✺ ┇ ⏣ ⟬ سـؤال الـحـقـيـقـة ⟭\n✺ ┇\n✺ ┇ ❓ ${randomQuestion}\n✺ ┇\n✧══════•❁◈❁•══════✧`, event.threadID, event.messageID);
+    } else if (arg1 === 'جرأة') {
       const dareChallenges = JSON.parse(fs.readFileSync(`DAREQN.json`));
-      const randomIndex = Math.floor(Math.random() * dareChallenges.length);
-      const randomChallenge = dareChallenges[randomIndex];
-
-      api.sendMessage(`هاهو التحدي الذي يجب أن تقوم به: \n${randomChallenge}`, event.threadID || event.senderID);
+      const randomChallenge = dareChallenges[Math.floor(Math.random() * dareChallenges.length)];
+      api.sendMessage(`✧══════•❁◈❁•══════✧\n✺ ┇\n✺ ┇ ⏣ ⟬ تـحـدي الـجـرأة ⟭\n✺ ┇\n✺ ┇ 🎯 ${randomChallenge}\n✺ ┇\n✧══════•❁◈❁•══════✧`, event.threadID, event.messageID);
     } else {
-      api.sendMessage("استخدام غير صالح، يرجى استخدام 'حقيقة&جرأة حقيقة' لسؤال الحقيقة أو 'حقيقة&جرأة جرأة' لسؤال التحدي.", event.threadID || event.senderID);
+      api.sendMessage("✧══════•❁◈❁•══════✧\n✺ ┇ ⚠️ استخدم: حقيقة&جرأة حقيقة | جرأة\n✧══════•❁◈❁•══════✧", event.threadID, event.messageID);
     }
   }
 };

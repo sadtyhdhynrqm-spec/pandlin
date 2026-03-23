@@ -19,56 +19,45 @@ async function askArabicAI(prompt) {
 
 export default {
   name: "ذكاء",
-  author: "Kaguya Project",
+  author: "سينكو 𓆩☆𓆪",
   role: "member",
-  aliases: ["gpt", "الذكاء"],
+  aliases: ["gpt", "الذكاء", "ai"],
   description: "تفاعل مع الذكاء الاصطناعي بالعربية",
 
   execute: async function({ api, event, args }) {
     try {
-      api.setMessageReaction("⏱️", event.messageID, (err) => {}, true);
-
-      const { threadID, senderID } = event;
+      api.setMessageReaction("⏱️", event.messageID, () => {}, true);
       const prompt = args.join(" ");
-
       if (!prompt) {
-        return api.sendMessage("⚠️ | اكتب سؤالك بعد الأمر\nمثال: /ذكاء ما هو الذكاء الاصطناعي؟", threadID, event.messageID);
+        return api.sendMessage(`✧══════•❁◈❁•══════✧\n✺ ┇ ⚠️ اكتب سؤالك بعد الأمر\n✺ ┇ مثال: ذكاء ما هو الذكاء الاصطناعي؟\n✧══════•❁◈❁•══════✧`, event.threadID, event.messageID);
       }
-
       const response = await askArabicAI(prompt);
+      api.setMessageReaction("✅", event.messageID, () => {}, true);
 
-      api.setMessageReaction("✅", event.messageID, (err) => {}, true);
-
-      const sentMessage = await api.sendMessage(response, threadID);
+      const msg = `✧══════•❁◈❁•══════✧\n✺ ┇\n✺ ┇ ⏣ ⟬ الـذكـاء الاصـطـنـاعـي ⟭\n✺ ┇\n✺ ┇ ${response.replace(/\n/g, '\n✺ ┇ ')}\n✺ ┇\n✧══════•❁◈❁•══════✧`;
+      const sentMessage = await api.sendMessage(msg, event.threadID, event.messageID);
       global.client.handler.reply.set(sentMessage.messageID, {
-        author: senderID,
-        type: "arabic_ai_chat",
-        name: "ذكاء",
-        unsend: false,
+        author: event.senderID, type: "arabic_ai_chat", name: "ذكاء", unsend: false,
       });
-
     } catch (error) {
-      api.setMessageReaction("❌", event.messageID, (err) => {}, true);
-      api.sendMessage(`❌ | حدث خطأ: ${error.message}`, event.threadID);
+      api.setMessageReaction("❌", event.messageID, () => {}, true);
+      api.sendMessage(`✧══════•❁◈❁•══════✧\n✺ ┇ ❌ حدث خطأ: ${error.message}\n✧══════•❁◈❁•══════✧`, event.threadID, event.messageID);
     }
   },
 
   onReply: async function({ api, event, reply }) {
     if (reply.type === "arabic_ai_chat" && reply.author === event.senderID) {
       try {
-        api.setMessageReaction("⏱️", event.messageID, (err) => {}, true);
+        api.setMessageReaction("⏱️", event.messageID, () => {}, true);
         const response = await askArabicAI(event.body);
-        api.setMessageReaction("✅", event.messageID, (err) => {}, true);
-
-        const sentMessage = await api.sendMessage(response, event.threadID);
+        api.setMessageReaction("✅", event.messageID, () => {}, true);
+        const msg = `✧══════•❁◈❁•══════✧\n✺ ┇\n✺ ┇ ⏣ ⟬ الـذكـاء الاصـطـنـاعـي ⟭\n✺ ┇\n✺ ┇ ${response.replace(/\n/g, '\n✺ ┇ ')}\n✺ ┇\n✧══════•❁◈❁•══════✧`;
+        const sentMessage = await api.sendMessage(msg, event.threadID, event.messageID);
         global.client.handler.reply.set(sentMessage.messageID, {
-          author: event.senderID,
-          type: "arabic_ai_chat",
-          name: "ذكاء",
-          unsend: false,
+          author: event.senderID, type: "arabic_ai_chat", name: "ذكاء", unsend: false,
         });
       } catch (error) {
-        api.sendMessage(`❌ | حدث خطأ: ${error.message}`, event.threadID);
+        api.sendMessage(`✧══════•❁◈❁•══════✧\n✺ ┇ ❌ حدث خطأ: ${error.message}\n✧══════•❁◈❁•══════✧`, event.threadID, event.messageID);
       }
     }
   }

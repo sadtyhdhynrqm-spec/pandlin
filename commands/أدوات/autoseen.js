@@ -1,18 +1,17 @@
-class AutoSeen {
-  name = "ڤيو";
-  author = "Thiệu Trung Kiên";
-  cooldowns = 60;
-  description = "انظر رسائل المستخدم!";
-  role = "owner";
-  aliases = ["رؤية"];
-  config = false;
+export default {
+  name: "ڤيو",
+  author: "سينكو 𓆩☆𓆪",
+  cooldowns: 10,
+  description: "تفعيل/تعطيل رؤية الرسائل تلقائياً",
+  role: "owner",
+  aliases: ["رؤية", "autoseen"],
+  _config: false,
   async events({ api }) {
-    this.config && api.markAsReadAll(() => {});
+    this._config && api.markAsReadAll(() => {});
+  },
+  async execute({ api, event }) {
+    this._config = !this._config;
+    const status = this._config ? "✅ مُفعّل" : "❌ مُعطّل";
+    api.sendMessage(`✧══════•❁◈❁•══════✧\n✺ ┇\n✺ ┇ ⏣ ⟬ الـرؤيـة الـتـلـقـائـيـة ⟭\n✺ ┇\n✺ ┇ ◍ الحـالـة: ${status}\n✺ ┇\n✧══════•❁◈❁•══════✧`, event.threadID, event.messageID);
   }
-  async execute() {
-    this.config = this.config ? false : true;
-    return kaguya.reply(`${this.config ? "✅" : "❌"} `);
-  }
-}
-
-export default new AutoSeen();
+};

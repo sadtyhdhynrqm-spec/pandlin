@@ -20,11 +20,11 @@ export default {
             const profilePath = await getProfilePicture(mentionedUserID);
             const user = event?.messageReply?.senderID ? await api.getUserInfo(mentionedUserID) : null;
             const name = user ? user[mentionedUserID].name : ""; 
-            const message = `تفضل صورة بروفايل ${name} :`;
+            const message = `✧══════•❁◈❁•══════✧\n✺ ┇\n✺ ┇ ⏣ ⟬ صـورة الـبـروفـايـل ⟭\n✺ ┇\n✺ ┇ 📸 ${name ? `بروفايل: ${name}` : "بروفايلك الشخصي"}\n✺ ┇\n✧══════•❁◈❁•══════✧`;
             return api.sendMessage({ body: message, attachment: fs.createReadStream(profilePath) }, event.threadID, event.messageID);
         } catch (error) {
             console.error(error);
-            return api.sendMessage("حدث خطأ أثناء جلب صورة البروفايل.", event.threadID);
+            return api.sendMessage("✧══════•❁◈❁•══════✧\n✺ ┇ ❌ حدث خطأ في جلب الصورة\n✧══════•❁◈❁•══════✧", event.threadID);
         }
     },
     onReply: async function ({ api, event, reply }) {
@@ -34,7 +34,7 @@ export default {
             return api.sendMessage({ body: "هذه صورتك الشخصية:", attachment: fs.createReadStream(profilePath) }, event.threadID, event.messageID);
         } catch (error) {
             console.error(error);
-            return api.sendMessage("حدث خطأ أثناء جلب صورة البروفايل.", event.threadID);
+            return api.sendMessage("✧══════•❁◈❁•══════✧\n✺ ┇ ❌ حدث خطأ في جلب الصورة\n✧══════•❁◈❁•══════✧", event.threadID);
         }
     }
 };

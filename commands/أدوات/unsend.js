@@ -1,25 +1,23 @@
 export default {
   name: "مسح",
-  author: "Kaguya Project",
-  cooldowns: 10,
-  description: "مسح رسائل ال",
+  author: "سينكو 𓆩☆𓆪",
+  cooldowns: 5,
+  description: "مسح رسالة البوت عند الرد عليها",
   role: "member",
-  aliases: ["gỡ"],
+  aliases: ["del", "حذف_رسالة"],
   execute: async ({ api, event }) => {
     if (event?.messageReply?.senderID != api.getCurrentUserID()) {
-      return kaguya.reply(" ⚠️ |لا يمكن مسح رسائل الآخرين!");
+      return api.sendMessage("✧══════•❁◈❁•══════✧\n✺ ┇ ⚠️ لا يمكن مسح رسائل الآخرين\n✧══════•❁◈❁•══════✧", event.threadID, event.messageID);
     }
-
-    return kaguya.unsend(event.messageReply.messageID, (err) => {
+    return api.unsendMessage(event.messageReply.messageID, (err) => {
       if (err) {
-        return kaguya.reply(" ⚠️ |لقد حدث خطأ، رجاء أعد المحاولة لاحقا!");
+        api.sendMessage("✧══════•❁◈❁•══════✧\n✺ ┇ ❌ حدث خطأ أثناء المسح\n✧══════•❁◈❁•══════✧", event.threadID, event.messageID);
       }
     });
   },
   events: async ({ api, event }) => {
-    var reaction = ["😡"];
-    if (event.reaction && event.senderID == api.getCurrentUserID() && reaction.includes(event.reaction)) {
-      kaguya.unsend(event.messageID);
+    if (event.reaction && event.senderID == api.getCurrentUserID() && event.reaction === "😡") {
+      api.unsendMessage(event.messageID);
     }
   },
 };

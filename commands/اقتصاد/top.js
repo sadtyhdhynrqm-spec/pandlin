@@ -4,25 +4,33 @@ import path from "path";
 const userDataFile = path.join(process.cwd(), 'pontsData.json');
 
 export default {
-    name: "توب",
-    author: "kaguya project",
-    role: "member",
-    description: "اعلام بأعلى المتصدرين في قائمة النقاط.",
-    execute: async function ({ api, event }) {
-        try {
-            const pointsData = JSON.parse(fs.readFileSync(userDataFile, 'utf8'));
-            const topUsers = Object.values(pointsData).sort((a, b) => b.points - a.points).slice(0, 5); // احصل على أعلى 5 مستخدمين
-            let topMessage = "🏆أعلى متصدرين في النقاط🏆\n";
+  name: "توب",
+  author: "سينكو 𓆩☆𓆪",
+  role: "member",
+  description: "أعلى المتصدرين في النقاط",
+  execute: async function ({ api, event }) {
+    try {
+      if (!fs.existsSync(userDataFile)) {
+        return api.sendMessage("✧══════•❁◈❁•══════✧\n✺ ┇ ⚠️ لا توجد بيانات بعد\n✧══════•❁◈❁•══════✧", event.threadID);
+      }
+      const pointsData = JSON.parse(fs.readFileSync(userDataFile, 'utf8'));
+      const topUsers = Object.values(pointsData).sort((a, b) => b.points - a.points).slice(0, 5);
 
-            topUsers.forEach((user, index) => {
-                const medal = index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : "🏅"; // تحديد الوسام حسب المركز
-                topMessage += `🎖️ | الترتيب : 『${medal}』\n👥 | الإسم : 『${user.name}』\n🔢 | النقاط : 『${user.points}』 نقطة\n`;
-            });
+      const medals = ["🥇", "🥈", "🥉", "🏅", "🏅"];
+      let rows = "";
+      topUsers.forEach((user, index) => {
+        rows += `✺ ┇ ${medals[index]} ${user.name} — ${user.points} نقطة\n`;
+      });
 
-            api.sendMessage(topMessage, event.threadID);
-        } catch (error) {
-            console.error("حدث خطأ أثناء جلب قائمة أعلى المتصدرين:", error);
-            api.sendMessage(`حدث خطأ أثناء جلب قائمة أعلى المتصدرين، يرجى المحاولة مرة أخرى`, event.threadID);
-        }
+      const msg = `✧══════•❁◈❁•══════✧
+✺ ┇
+✺ ┇ ⏣ ⟬ قـائـمـة الـمـتـصـدريـن ⟭
+✺ ┇
+${rows}✺ ┇
+✧══════•❁◈❁•══════✧`;
+      api.sendMessage(msg, event.threadID, event.messageID);
+    } catch (error) {
+      api.sendMessage("✧══════•❁◈❁•══════✧\n✺ ┇ ❌ حدث خطأ في جلب البيانات\n✧══════•❁◈❁•══════✧", event.threadID);
     }
+  }
 };

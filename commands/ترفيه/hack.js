@@ -1,19 +1,25 @@
 export default {
   name: "اخترق",
-  author: "حمودي سان",
+  author: "سينكو 𓆩☆𓆪",
   cooldowns: 5,
   description: "اختراق وهمي",
   execute: async ({ api, event, args }) => {
-    const hackMessage = `
-🧩 *نظام الاختراق الوهمي* 🧩
-────────────────────
-🟢 الاتصال متشفر
-🔐 كسر التشفير...
-⚡ جاري الولوج...
-✅ تم الاختراق بنجاح!
-────────────────────
-من: حمودي سان 🇸🇩
-    `;
-    api.sendMessage(hackMessage, event.threadID);
+    const target = args.join(" ") || "الهدف";
+    const percent = Math.floor(Math.random() * 30) + 70;
+    const msg = `✧══════•❁◈❁•══════✧
+✺ ┇
+✺ ┇ ⏣ ⟬ نـظـام الاخـتـراق ⟭
+✺ ┇
+✺ ┇ ◍ الهـدف: ${target}
+✺ ┇ ◍ كسر التشفير... ████████░░
+✺ ┇ ◍ اختراق الجدار الناري... ✓
+✺ ┇ ◍ الوصول للبيانات... ✓
+✺ ┇ ◍ مسح الآثار... ✓
+✺ ┇ ◍ نسبة النجاح: ${percent}٪
+✺ ┇
+✺ ┇ ⠇تـم الاخـتـراق بـنـجـاح ✅
+✺ ┇
+✧══════•❁◈❁•══════✧`;
+    api.sendMessage(msg, event.threadID, event.messageID);
   }
 };

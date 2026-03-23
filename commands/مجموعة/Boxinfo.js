@@ -1,62 +1,65 @@
-import axios from 'axios';
 import fs from 'fs';
 import request from 'request';
 
 export default {
   name: "مجموعتي",
-  author: "حسين الملقب ب (صائد الأرواح)",
+  author: "سينكو 𓆩☆𓆪",
   role: "member",
-  description: "عرض معلومات عن المجموعة",
-  aliases:["م_مج"],
+  description: "عرض معلومات المجموعة",
+  aliases: ["م_مج", "groupinfo"],
   execute: async function ({ api, event }) {
     try {
-      let threadInfo = await api.getThreadInfo(event.threadID);
-      var memLength = threadInfo.participantIDs.length;
-      var nameMen = [];
-      var gendernam = [];
-      var gendernu = [];
-      var nope = [];
+      const threadInfo = await api.getThreadInfo(event.threadID);
+      const memLength = threadInfo.participantIDs.length;
+      let males = 0, females = 0, unknown = 0;
       for (let z in threadInfo.userInfo) {
-        var gioitinhone = threadInfo.userInfo[z].gender;
-        var nName = threadInfo.userInfo[z].name;
-        if (gioitinhone == "MALE") { gendernam.push(z + gioitinhone) }
-        else if (gioitinhone == "FEMALE") { gendernu.push(gioitinhone) }
-        else { nope.push(nName) }
-      };
-      var nam = gendernam.length;
-      var nu = gendernu.length;
-      var listad = '';
-      var qtv2 = threadInfo.adminIDs;
-      let qtv = threadInfo.adminIDs.length;
-      let sl = threadInfo.messageCount;
-      let u = threadInfo.nicknames;
-      let icon = threadInfo.emoji;
-      let threadName = threadInfo.threadName;
-      let id = threadInfo.threadID;
-      for (let i = 0; i < qtv2.length; i++) {
-        const infu = (await api.getUserInfo(qtv2[i].id));
-        const name = infu[qtv2[i].id].name;
-        listad += '•' + name + '\n';
+        const g = threadInfo.userInfo[z].gender;
+        if (g === "MALE") males++;
+        else if (g === "FEMALE") females++;
+        else unknown++;
       }
-      let sex = threadInfo.approvalMode;
-      var pd = sex == false ? 'تم تشغيلها' : sex == true ? 'تم تعطيلها' : 'loid';
-      var callback = () =>
-        api.sendMessage(
-          {
-            body: `◆❯━━━━━▣✦▣━━━━━━❮◆\n💫「 إسم المجموعة 」:${threadName}\n💫「 آيدي المجموعة 」: ${id}\n💫「 الموافقة 」: ${pd}\n💫「 الإيموجي 」: ${icon}\n💫「 معلومات 」: تتضمن ${memLength} أعضاء/عضو\n💫「 عدد الإناث 」: ${nam}\n💫「 عدد الذكور 」:  ${nu}\n💫「 إجمالي عدد المسؤولين 」: ${qtv} \n「 يتضمن 」:\n${listad}\n💫「 إجمال عدد الرسائل 」: ${sl} رسالة\n◆❯━━━━━▣✦▣━━━━━━❮◆`,
-            attachment: fs.createReadStream(process.cwd() + '/cache/1.png')
-          },
-          event.threadID,
-          () => fs.unlinkSync(process.cwd() + '/cache/1.png'),
-          event.messageID
-        );
-      return request(encodeURI(`${threadInfo.imageSrc}`))
-        .pipe(fs.createWriteStream(process.cwd() + '/cache/1.png'))
-        .on('close', () => callback());
+      let listad = '';
+      for (let i = 0; i < threadInfo.adminIDs.length; i++) {
+        const infu = await api.getUserInfo(threadInfo.adminIDs[i].id);
+        listad += `✺ ┇    • ${infu[threadInfo.adminIDs[i].id].name}\n`;
+      }
+      const approvalMode = threadInfo.approvalMode ? '🔒 مُفعّل' : '🔓 مُعطّل';
+
+      const body = `✧══════•❁◈❁•══════✧
+✺ ┇
+✺ ┇ ⏣ ⟬ مـعـلـومـات الـمـجـمـوعـة ⟭
+✺ ┇
+✺ ┇ ◍ الاسـم: ${threadInfo.threadName}
+✺ ┇ ◍ الآيـدي: ${event.threadID}
+✺ ┇ ◍ الإيـمـوجـي: ${threadInfo.emoji || "—"}
+✺ ┇ ◍ الـمـوافـقـة: ${approvalMode}
+✺ ┇ ◍ الأعـضـاء: ${memLength}
+✺ ┇ ◍ ذكـور: ${males} | إنـاث: ${females}
+✺ ┇ ◍ الـرسـائـل: ${threadInfo.messageCount}
+✺ ┇ ◍ الـمـشـرفـون (${threadInfo.adminIDs.length}):
+${listad}✺ ┇
+✧══════•❁◈❁•══════✧`;
+
+      const callback = () => {
+        const imgPath = process.cwd() + '/cache/1.png';
+        if (fs.existsSync(imgPath)) {
+          api.sendMessage({ body, attachment: fs.createReadStream(imgPath) }, event.threadID, () => {
+            try { fs.unlinkSync(imgPath); } catch (e) {}
+          }, event.messageID);
+        } else {
+          api.sendMessage(body, event.threadID, event.messageID);
+        }
+      };
+
+      if (threadInfo.imageSrc) {
+        request(encodeURI(threadInfo.imageSrc))
+          .pipe(fs.createWriteStream(process.cwd() + '/cache/1.png'))
+          .on('close', callback);
+      } else {
+        api.sendMessage(body, event.threadID, event.messageID);
+      }
     } catch (error) {
-      console.error(error);
-      api.sendMessage(" ❌ |حدث خطأ أثناء جلب معلومات المجموعة.", event.threadID);
+      api.sendMessage("✧══════•❁◈❁•══════✧\n✺ ┇ ❌ حدث خطأ في جلب معلومات المجموعة\n✧══════•❁◈❁•══════✧", event.threadID, event.messageID);
     }
   },
 };
-      

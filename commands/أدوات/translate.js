@@ -2,54 +2,50 @@ import axios from 'axios';
 
 export default {
   name: "ترجمة",
-  author: "kaguya project",
+  author: "سينكو 𓆩☆𓆪",
   cooldowns: 10,
-  description: "ترجمة النص من لغة إلى أخرى باستخدام خدمة Google Translate.",
+  description: "ترجمة النص من لغة إلى أخرى",
   role: "member",
   aliases: ["translate", "ترجمي"],
   execute: async ({ api, event, args }) => {
-    const request = axios.create();
     const content = args.join(" ");
-
     if (content.length === 0 && !event.messageReply) {
-      api.sendMessage("يرجى كتابة النص الذي تريد ترجمته أو الرد على الرسالة التي تحتوي على النص.", event.threadID, event.messageID);
-      return;
+      return api.sendMessage(`✧══════•❁◈❁•══════✧\n✺ ┇ ⚠️ اكتب النص أو رد على رسالة\n✺ ┇ مثال: ترجمة مرحبا ->en\n✧══════•❁◈❁•══════✧`, event.threadID, event.messageID);
     }
 
     let translateThis, lang;
     if (event.messageReply) {
       translateThis = event.messageReply.body;
-      lang = content.includes("->") ? content.split("->")[1].trim() : 'ar'; // تعيين اللغة الافتراضية إلى العربية 'ar'
+      lang = content.includes("->") ? content.split("->")[1].trim() : 'ar';
     } else {
-      const indexOfArrow = content.indexOf("->");
-      if (indexOfArrow !== -1) {
-        translateThis = content.slice(0, indexOfArrow).trim();
-        lang = content.slice(indexOfArrow + 2).trim();
+      const idx = content.indexOf("->");
+      if (idx !== -1) {
+        translateThis = content.slice(0, idx).trim();
+        lang = content.slice(idx + 2).trim();
       } else {
         translateThis = content;
-        lang = 'ar'; // تعيين اللغة الافتراضية إلى العربية 'ar'
+        lang = 'ar';
       }
     }
 
     try {
-      const response = await request.get(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${lang}&dt=t&q=${encodeURIComponent(translateThis)}`);
-      const translationData = response.data;
-
-      // استخراج النص المترجم من الاستجابة
+      const response = await axios.get(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${lang}&dt=t&q=${encodeURIComponent(translateThis)}`);
       let translatedText = '';
-      translationData[0].forEach(item => {
-        if (item[0]) {
-          translatedText += item[0];
-        }
-      });
+      response.data[0].forEach(item => { if (item[0]) translatedText += item[0]; });
+      const fromLang = response.data[2] || 'auto';
 
-      // تحديد اللغة المصدر
-      const fromLang = (translationData[2] === translationData[8][0][0]) ? translationData[2] : translationData[8][0][0];
-
-      api.sendMessage(`🌐 الترجمة: ${translatedText}\n- تمت الترجمة من ${fromLang} إلى ${lang}`, event.threadID, event.messageID);
+      const msg = `✧══════•❁◈❁•══════✧
+✺ ┇
+✺ ┇ ⏣ ⟬ نـظـام الـتـرجـمـة ⟭
+✺ ┇
+✺ ┇ ◍ مـن: ${fromLang} → ${lang}
+✺ ┇
+✺ ┇ 🌐 ${translatedText}
+✺ ┇
+✧══════•❁◈❁•══════✧`;
+      api.sendMessage(msg, event.threadID, event.messageID);
     } catch (error) {
-      console.error(error);
-      api.sendMessage("حدث خطأ أثناء عملية الترجمة.", event.threadID, event.messageID);
+      api.sendMessage("✧══════•❁◈❁•══════✧\n✺ ┇ ❌ حدث خطأ في الترجمة\n✧══════•❁◈❁•══════✧", event.threadID, event.messageID);
     }
   },
 };

@@ -14,7 +14,7 @@ export default {
 
 api.setMessageReaction("⚠️", event.messageID, (err) => {}, true);
       // إذا لم يتم إدخال أي نص
-      return api.sendMessage("⚠️ | من فضلك أدخل شيئًا لأقوله.", event.threadID);
+      return api.sendMessage("✧══════•❁◈❁•══════✧\n✺ ┇ ⚠️ أدخل النص بعد الأمر\n✧══════•❁◈❁•══════✧", event.threadID);
     }
 
 api.setMessageReaction("⏱️", event.messageID, (err) => {}, true);
@@ -41,7 +41,7 @@ api.setMessageReaction("⏱️", event.messageID, (err) => {}, true);
 
 api.setMessageReaction("✅", event.messageID, (err) => {}, true);
         await api.sendMessage({
-          body: `✅ تم تحويل النص إلى كلام باستخدام النموذج الصوتي: ${data.voiceModel}`,
+          body: `✧══════•❁◈❁•══════✧\n✺ ┇\n✺ ┇ ⏣ ⟬ تـحـويـل الـنـص ⟭\n✺ ┇\n✺ ┇ ✅ تم التحويل إلى صوت\n✺ ┇\n✧══════•❁◈❁•══════✧`,
           attachment: fs.createReadStream(audioPath)
         }, event.threadID);
 

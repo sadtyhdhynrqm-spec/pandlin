@@ -14,13 +14,12 @@ export default {
       const userBalance = (await Economy.getBalance(event.senderID)).data;
 
       // إرسال الرسالة الأولية تطلب من المستخدم دفع المبلغ
-      const initialMessage = `📝 |  رد عـلـى هـذه الـرسـالـة وأدخـل ${cost} دولار مـن أجـل الاقـتـبـاس`;
-      const successInitialMessage = await api.sendMessage(initialMessage, event.threadID);
-
-      // التحقق من الرصيد
       if (userBalance < cost) {
-        return api.sendMessage(`⚠️ | لا يوجد لديك رصيد كافٍ. يجب أن يكون لديك ${cost} دولار أولاً.`, event.threadID);
+        return api.sendMessage(`✧══════•❁◈❁•══════✧\n✺ ┇ ⚠️ رصيدك غير كافٍ\n✺ ┇ تحتاج: ${cost} دولار\n✧══════•❁◈❁•══════✧`, event.threadID);
       }
+
+      const initialMessage = `✧══════•❁◈❁•══════✧\n✺ ┇\n✺ ┇ ⏣ ⟬ الاقـتـبـاسـات ⟭\n✺ ┇\n✺ ┇ رد على هذه الرسالة وأدخل ${cost}\n✺ ┇ ليصلك اقتباس مميز 📝\n✺ ┇\n✧══════•❁◈❁•══════✧`;
+      const successInitialMessage = await api.sendMessage(initialMessage, event.threadID);
 
       global.client.handler.reply.set(successInitialMessage.messageID, {
         author: event.senderID,
@@ -41,16 +40,14 @@ export default {
       const cost = reply.cost;
       const userBalance = (await Economy.getBalance(event.senderID)).data;
 
-      // التحقق من الرصيد مرة أخرى
       if (userBalance < cost) {
-        api.setMessageReaction("⚠️", event.messageID, (err) => {}, true);
-        return api.sendMessage(`⚠️ | لا يوجد لديك رصيد كافٍ. يرجى تفقد رصيدك عن طريق كتابة 'رصيدي'.`, event.threadID);
+        api.setMessageReaction("⚠️", event.messageID, () => {}, true);
+        return api.sendMessage(`✧══════•❁◈❁•══════✧\n✺ ┇ ⚠️ رصيدك غير كافٍ\n✧══════•❁◈❁•══════✧`, event.threadID);
       }
 
-      // التحقق إذا لم يدفع المستخدم المبلغ الصحيح
       if (event.body.trim() !== cost.toString()) {
-        api.setMessageReaction("⚠️", event.messageID, (err) => {}, true);
-        return api.sendMessage(`⚠️ | المرجو دفع المبلغ المحدد وهو ${cost} دولار.`, event.threadID);
+        api.setMessageReaction("⚠️", event.messageID, () => {}, true);
+        return api.sendMessage(`✧══════•❁◈❁•══════✧\n✺ ┇ ⚠️ أدخل المبلغ المحدد: ${cost} دولار\n✧══════•❁◈❁•══════✧`, event.threadID);
       }
 
       // في حال دفع المستخدم المبلغ المحدد بنجاح

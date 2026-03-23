@@ -1,45 +1,38 @@
 import fs from 'fs-extra';
 import request from 'request';
 
-async function fetchGroupImage({ api, event }) {
-    try {
-        let threadInfo = await api.getThreadInfo(event.threadID);
-        let { threadName, participantIDs, imageSrc } = threadInfo;
-
-        if (imageSrc) {
-            let callback = async function() {
-                api.sendMessage(
-                    {
-                        body: `معرف المجموعة : ${event.threadID}`,
-                        attachment: fs.createReadStream(process.cwd() + '/cache/thread.png')
-                    },
-                    event.threadID,
-                    () => {
-                        fs.unlinkSync(process.cwd() + '/cache/thread.png');
-                    }
-                );
-            };
-
-            request(imageSrc)
-                .pipe(fs.createWriteStream(process.cwd() + '/cache/thread.png'))
-                .on('close', callback);
-        } else {
-            api.sendMessage(
-                ` معرف المجموعة : ${event.threadID}\n ⁉️ | هذه المجموعة لاتمتلك صورة `,
-                event.threadID
-            );
-        }
-    } catch (error) {
-        console.error("Error fetching group image:", error.message);
-        api.sendMessage("❌ | Error fetching group image.", event.threadID);
-    }
-}
-
 export default {
-    name: "تيد",
-    author: "Kaguya Project",
-    role: "member",
-    aliases:["tid"],
-    description: "يقوم بجلب صورة المجموعة إذا كانت موجودة.",
-    execute: fetchGroupImage
+  name: "تيد",
+  author: "سينكو 𓆩☆𓆪",
+  role: "member",
+  aliases: ["tid", "معرف_المجموعة"],
+  description: "جلب صورة ومعرف المجموعة",
+  execute: async function ({ api, event }) {
+    try {
+      const threadInfo = await api.getThreadInfo(event.threadID);
+      const body = `✧══════•❁◈❁•══════✧
+✺ ┇
+✺ ┇ ⏣ ⟬ مـعـرف الـمـجـمـوعـة ⟭
+✺ ┇
+✺ ┇ ◍ الاسـم: ${threadInfo.threadName}
+✺ ┇ ◍ الـمـعـرف: ${event.threadID}
+✺ ┇
+✧══════•❁◈❁•══════✧`;
+
+      if (threadInfo.imageSrc) {
+        const imgPath = process.cwd() + '/cache/thread.png';
+        request(threadInfo.imageSrc)
+          .pipe(fs.createWriteStream(imgPath))
+          .on('close', () => {
+            api.sendMessage({ body, attachment: fs.createReadStream(imgPath) }, event.threadID, () => {
+              try { fs.unlinkSync(imgPath); } catch (e) {}
+            }, event.messageID);
+          });
+      } else {
+        api.sendMessage(body, event.threadID, event.messageID);
+      }
+    } catch (error) {
+      api.sendMessage("✧══════•❁◈❁•══════✧\n✺ ┇ ❌ حدث خطأ في جلب معلومات المجموعة\n✧══════•❁◈❁•══════✧", event.threadID, event.messageID);
+    }
+  }
 };

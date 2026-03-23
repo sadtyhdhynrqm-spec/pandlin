@@ -1,10 +1,10 @@
-class Kick {
-  name = "طرد";
-  author = "Kaguya Project";
-  cooldowns = 60;
-  description = "قم بطرد الأعضاء المحددين من المجموعة";
-  role = "admin";
-  aliases = ["إبلع"];
+export default {
+  name: "طرد",
+  author: "سينكو 𓆩☆𓆪",
+  cooldowns: 10,
+  description: "طرد عضو من المجموعة",
+  role: "admin",
+  aliases: ["kick", "إخراج"],
 
   async execute({ api, event, Threads }) {
     try {
@@ -12,21 +12,25 @@ class Kick {
       const targetUserID = event?.messageReply?.senderID || (mentions.length > 0 ? mentions[0] : null);
 
       if (!targetUserID) {
-        return api.sendMessage(" ⚠️ | المرجو الرد على رسالة الشخص الذي تريد طرده أو عمل منشن له.", event.threadID);
+        return api.sendMessage(`✧══════•❁◈❁•══════✧\n✺ ┇ ⚠️ رد على رسالة الشخص أو اعمل منشن له\n✧══════•❁◈❁•══════✧`, event.threadID, event.messageID);
       }
 
       const threadData = (await Threads.find(event.threadID))?.data?.data;
       if (!threadData.adminIDs.includes(api.getCurrentUserID())) {
-        return api.sendMessage(" ⚠️ | يحتاج البوت أن يكون آدمن لإستخدام هذه الميزة", event.threadID);
+        return api.sendMessage(`✧══════•❁◈❁•══════✧\n✺ ┇ ⚠️ البوت يحتاج صلاحية الآدمن\n✧══════•❁◈❁•══════✧`, event.threadID, event.messageID);
       }
 
       await api.removeUserFromGroup(targetUserID, event.threadID);
-      api.sendMessage("✅ | طلباتك أوامر !\n ناقص واحد ناقص مشكلة 😌", event.threadID);
+      api.sendMessage(`✧══════•❁◈❁•══════✧
+✺ ┇
+✺ ┇ ⏣ ⟬ نـظـام الـطـرد ⟭
+✺ ┇
+✺ ┇ ✅ تم الطرد بنجاح
+✺ ┇ 😌 ناقص عضو ناقصت مشكلة
+✺ ┇
+✧══════•❁◈❁•══════✧`, event.threadID, event.messageID);
     } catch (err) {
-      console.error(err);
-      api.sendMessage(" ⚠️ | لقد حدث خطأ غير متوقع!", event.threadID);
+      api.sendMessage("✧══════•❁◈❁•══════✧\n✺ ┇ ❌ حدث خطأ غير متوقع\n✧══════•❁◈❁•══════✧", event.threadID, event.messageID);
     }
   }
-}
-
-export default new Kick();
+};

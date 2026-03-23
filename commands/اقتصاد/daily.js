@@ -1,20 +1,16 @@
 import axios from "axios";
 import fs from "fs";
 
-class CheckTT {
-  constructor() {
-    this.name = "هدية";
-    this.author = "Kaguya Project";
-    this.role = "member";
-    this.description = "الحصول على مال اليومي كل يوم";
-    this.aliases = ["هديه"];
-    this.cooldowns = 3600; // 3600 ثانية تعني ساعة واحدة
-  }
-
+export default {
+  name: "هدية",
+  author: "سينكو 𓆩☆𓆪",
+  role: "member",
+  description: "الحصول على مكافأة يومية",
+  aliases: ["هديه", "يومي"],
+  cooldowns: 3600,
   async execute({ api, event, Economy, Users }) {
     const currentTime = Math.floor(Date.now() / 1000);
-    const timeStamps = this.cooldowns; // ساعة واحدة
-
+    const timeStamps = 3600;
     try {
       const lastCheckedTime = await Users.find(event.senderID);
       if (
@@ -24,46 +20,38 @@ class CheckTT {
         const remainingTime = timeStamps - (currentTime - lastCheckedTime?.data?.data?.other?.cooldowns);
         const minutes = Math.floor(remainingTime / 60);
         const seconds = remainingTime % 60;
-        return api.sendMessage(`⚠️ | لقد حصلت هلى مكافئتك بالفعل\n ⏱️ | قم بالعودة بعد: ${minutes} دقيقة ${seconds} ثانية`, event.threadID);
+        return api.sendMessage(`✧══════•❁◈❁•══════✧
+✺ ┇
+✺ ┇ ⏣ ⟬ الـمـكـافـأة الـيـومـيـة ⟭
+✺ ┇
+✺ ┇ ⚠️ لقد أخذت مكافأتك بالفعل
+✺ ┇ ⏱️ عُد بعد: ${minutes} دقيقة ${seconds} ثانية
+✺ ┇
+✧══════•❁◈❁•══════✧`, event.threadID, event.messageID);
       }
 
-      // قائمة المكافآت اليومية
-      const dailyRewards = ["5000", "1000", "1050", "1600", "1000", "1009", "1200", "1000", "1400", "1581", "1980", "9910", "1697", "6955", "6900", "6990", "4231", "5482", "1158", "1151", "5400"];
-
-      // اختيار مكافأة عشوائية
-      const randomIndex = Math.floor(Math.random() * dailyRewards.length);
-      const rewardAmount = parseInt(dailyRewards[randomIndex]);
+      const dailyRewards = [5000, 1000, 1050, 1600, 1200, 1400, 1981, 9910, 6955, 4231, 5482, 5400];
+      const rewardAmount = dailyRewards[Math.floor(Math.random() * dailyRewards.length)];
 
       await Economy.increase(rewardAmount, event.senderID);
-      await Users.update(event.senderID, {
-        other: {
-          cooldowns: currentTime,
-        },
-      });
+      await Users.update(event.senderID, { other: { cooldowns: currentTime } });
 
-      // جلب الصورة المتحركة
-      const response = await axios.get("https://i.imgur.com/t5VGSUZ.gif", { responseType: "stream" });
-
-      // حفظ الصورة المتحركة المحملة إلى ملف مؤقت
-      const imagePath = "./cache/temp.gif";
-      const writer = fs.createWriteStream(imagePath);
-      response.data.pipe(writer);
-
-      writer.on("finish", () => {
-        // إرسال الصورة المتحركة مع رسالة الهدية
-        api.sendMessage(
-          {
-            body: `✅ | 𝔡𝔬𝔫𝔢 𝔰𝔲𝔠𝔠𝔢𝔰𝔰𝔣𝔲𝔩𝔩𝔶 \n مكافئتك هي 🎁: ${rewardAmount} دولار`,
+      try {
+        const response = await axios.get("https://i.imgur.com/t5VGSUZ.gif", { responseType: "stream" });
+        const imagePath = "./cache/temp.gif";
+        const writer = fs.createWriteStream(imagePath);
+        response.data.pipe(writer);
+        writer.on("finish", () => {
+          api.sendMessage({
+            body: `✧══════•❁◈❁•══════✧\n✺ ┇\n✺ ┇ ⏣ ⟬ الـمـكـافـأة الـيـومـيـة ⟭\n✺ ┇\n✺ ┇ ✅ تم إيداع مكافأتك بنجاح\n✺ ┇ 🎁 المبلغ: ${rewardAmount} دولار\n✺ ┇\n✧══════•❁◈❁•══════✧`,
             attachment: fs.createReadStream(imagePath),
-          },
-          event.threadID
-        );
-      });
+          }, event.threadID, event.messageID);
+        });
+      } catch (imgErr) {
+        api.sendMessage(`✧══════•❁◈❁•══════✧\n✺ ┇\n✺ ┇ ⏣ ⟬ الـمـكـافـأة الـيـومـيـة ⟭\n✺ ┇\n✺ ┇ ✅ تم إيداع: ${rewardAmount} دولار 🎁\n✺ ┇\n✧══════•❁◈❁•══════✧`, event.threadID, event.messageID);
+      }
     } catch (error) {
-      console.error("❌ | حدث خطأ:", error);
-      api.sendMessage("❌ | حدث خطأ أثناء تنفيذ العملية.", event.threadID);
+      api.sendMessage("✧══════•❁◈❁•══════✧\n✺ ┇ ❌ حدث خطأ أثناء التنفيذ\n✧══════•❁◈❁•══════✧", event.threadID);
     }
   }
-}
-
-export default new CheckTT();
+};

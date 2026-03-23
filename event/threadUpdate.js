@@ -47,24 +47,20 @@ async function handleNicknameChange(api, event, Threads, threads) {
   const { userID, newNickname } = event.logMessageData;
 
   if (threads.anti?.nicknameBox) {
-    await api.setUserNickname(userID, threads.data.oldNicknames[userID] || "");
+    await api.setUserNickname(userID, threads.data.oldNicknames?.[userID] || "");
     return api.sendMessage(
-      `❌ | ميزة حماية الكنية مفعلة، لذا لم يتم تغيير كنية العضو 🔖 |<${event.threadID}> - ${threads.name}`,
+      `✧══════•❁◈❁•══════✧\n✺ ┇ 🛡️ حماية الكنية مُفعّلة\n✺ ┇ ❌ لا يمكن تغيير الكنية\n✧══════•❁◈❁•══════✧`,
       event.threadID
     );
   }
 
-  // تحديث الكنية في البيانات
   threads.data.oldNicknames = threads.data.oldNicknames || {};
   threads.data.oldNicknames[userID] = newNickname;
-
-  await Threads.update(event.threadID, {
-    data: threads.data,
-  });
+  await Threads.update(event.threadID, { data: threads.data });
 
   const adminName = await getUserName(api, event.author);
   api.sendMessage(
-    `تم تغيير كنية العضو <${userID}> إلى: ${newNickname} 🔖 | بواسطة: ${adminName}`,
+    `✧══════•❁◈❁•══════✧\n✺ ┇ 🏷️ تم تغيير الكنية\n✺ ┇ ◍ إلى: ${newNickname}\n✺ ┇ ◍ بواسطة: ${adminName}\n✧══════•❁◈❁•══════✧`,
     event.threadID
   );
 }
@@ -77,18 +73,16 @@ async function handleThreadName(api, event, Threads, threads) {
   if (threads.anti?.nameBox) {
     await api.setTitle(oldName, event.threadID);
     return api.sendMessage(
-      `❌ | ميزة حماية الاسم مفعلة، لذا لم يتم تغيير اسم المجموعة 🔖 |<${event.threadID}> - ${threads.name}`,
+      `✧══════•❁◈❁•══════✧\n✺ ┇ 🛡️ حماية الاسم مُفعّلة\n✺ ┇ ❌ لا يمكن تغيير اسم المجموعة\n✧══════•❁◈❁•══════✧`,
       event.threadID
     );
   }
 
-  await Threads.update(event.threadID, {
-    name: newName,
-  });
+  await Threads.update(event.threadID, { name: newName });
 
   const adminName = await getUserName(api, event.author);
   api.sendMessage(
-    `تم تغيير الاسم الجديد للمجموعة إلى: 🔖 | - 『${newName}』 بواسطة: ${adminName}`,
+    `✧══════•❁◈❁•══════✧\n✺ ┇ 📝 تم تغيير اسم المجموعة\n✺ ┇ ◍ إلى: 『${newName}』\n✺ ┇ ◍ بواسطة: ${adminName}\n✧══════•❁◈❁•══════✧`,
     event.threadID
   );
 }
@@ -138,20 +132,21 @@ async function handleApprovalModeChange(api, event, Threads, threads) {
 // التعامل مع تغيير أيقونة المجموعة
 async function handleThreadIconChange(api, event, Threads, threads) {
   const { threadThumbnail: newIcon } = event.logMessageData;
-  const oldIcon = threads.data.threadThumbnail || null; // افترض أن هذا هو رمز الأيقونة القديم
   const adminName = await getUserName(api, event.author);
 
-  // تحديث بيانات المجموعة لتخزين الصورة القديمة
+  if (threads.anti?.iconBox) {
+    return api.sendMessage(
+      `✧══════•❁◈❁•══════✧\n✺ ┇ 🛡️ حماية الصورة مُفعّلة\n✺ ┇ ❌ لا يمكن تغيير صورة المجموعة\n✧══════•❁◈❁•══════✧`,
+      event.threadID
+    );
+  }
+
   await Threads.update(event.threadID, {
-    data: {
-      ...threads.data,
-      threadThumbnail: newIcon, // تحديث الصورة الرمزية الجديدة
-    },
+    data: { ...threads.data, threadThumbnail: newIcon },
   });
 
-  // إرسال إشعار بتغيير الصورة
   api.sendMessage(
-    `تم تغيير صورة المجموعة بواسطة: ${adminName}`,
+    `✧══════•❁◈❁•══════✧\n✺ ┇ 🖼️ تم تغيير صورة المجموعة\n✺ ┇ بواسطة: ${adminName}\n✧══════•❁◈❁•══════✧`,
     event.threadID
   );
 }
