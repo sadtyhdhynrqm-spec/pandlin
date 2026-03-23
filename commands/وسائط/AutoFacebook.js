@@ -2,86 +2,98 @@ import axios from "axios";
 import path from "path";
 import fs from "fs-extra";
 
-class VideoDownloader {
-  name = "فيس";
-  author = "kaguya project";
+class MultiDownloader {
+  name = "تحميل";
+  author = "S I N K O";
   role = "member";
-  description =
-    "تنزيل مقاطع الفيديو من Facebook باستخدام رابط URL.";
+  description = "تحميل دقيق وصاروخي للفيس والتيك توك بدون أخطاء.";
 
-  async execute({ api, event }) {
-    api.setMessageReaction("⏱️", event.messageID, (err) => {}, true);
+  async execute({ api, event, linkInput }) {
+    const link = linkInput;
+    if (!link) return;
 
-    const link = event.body.trim();
-    const downloadingMsg = await api.sendMessage("⏳ | جـارٍ تـنـزيـل الـمـقـطـع...", event.threadID);
+    // تفاعل البدء
+    api.setMessageReaction("🧭", event.messageID, () => {}, true);
 
     try {
-      // استخدام رابط API الجديد
-      const apiUrl = `https://kaiz-apis.gleeze.com/api/fbdl?url=${encodeURIComponent(link)}apikey=c31e5b66-f953-44df-ba24-574743539332`;
+      let apiUrl = "";
+      // استخدام السيرفر السريع اللي جربناه ونفع
+      if (link.includes("facebook.com") || link.includes("fb.watch") || link.includes("share/r")) {
+        apiUrl = `https://hridoy-apis.vercel.app/downloader/facebook2?url=${encodeURIComponent(link)}&apikey=hridoyXQC`;
+      } else if (link.includes("tiktok.com")) {
+        apiUrl = `https://api.tiklydown.eu.org/api/download?url=${encodeURIComponent(link)}`;
+      }
 
-      // طلب البيانات من API
-      const response = await axios.get(apiUrl);
-      const mediaData = response.data;
+      if (!apiUrl) return;
 
-      // تحقق من نجاح الاستجابة وتوفر الفيديو
-      if (mediaData?.videoUrl) {
-        const videoUrl = mediaData.videoUrl;
-        const videoTitle = mediaData.title || "غير معروف";
-        const videoQuality = mediaData.quality || "غير معروف";
-        const videoThumbnail = mediaData.thumbnail;
-        const videoPath = path.join(process.cwd(), "cache", `${Date.now()}.mp4`);
-        fs.ensureDirSync(path.join(process.cwd(), "cache"));
+      const response = await axios.get(apiUrl, { timeout: 30000 });
+      const resData = response.data;
 
-        // تحميل الفيديو
-        const videoStream = await axios({
-          method: "GET",
-          url: videoUrl,
-          responseType: "stream",
+      let downloadUrl = "";
+      if (link.includes("facebook")) {
+        // سحب الرابط بدقة من استجابة hridoy
+        downloadUrl = resData.video_HD?.url || resData.video_SD?.url || resData.result?.hd || resData.result?.sd;
+      } else if (link.includes("tiktok")) {
+        downloadUrl = resData.video?.noWatermark || resData.video?.watermark;
+      }
+
+      if (downloadUrl) {
+        // إنشاء اسم ملف فريد جداً لضمان عدم تداخل الفيديوهات
+        const fileName = `fb_tt_${Date.now()}_${Math.floor(Math.random() * 1000)}.mp4`;
+        const videoPath = path.join(process.cwd(), "cache", fileName);
+        await fs.ensureDir(path.join(process.cwd(), "cache"));
+
+        const videoRes = await axios.get(downloadUrl, { 
+          responseType: 'arraybuffer',
+          headers: { 'User-Agent': 'Mozilla/5.0' }
         });
+        
+        await fs.writeFile(videoPath, Buffer.from(videoRes.data));
 
-        const fileWriteStream = fs.createWriteStream(videoPath);
-        videoStream.data.pipe(fileWriteStream);
+        // تفاعل النجاح
+        api.setMessageReaction("✅", event.messageID, () => {}, true);
 
-        fileWriteStream.on("finish", async () => {
-          await api.unsendMessage(downloadingMsg.messageID);
-          api.setMessageReaction("✅", event.messageID, (err) => {}, true);
-          await api.sendMessage(
-            {
-              body: `✅ | تـم تـنـزيـل الـفـيـديـو بـنـجـاح! \n📺 | الـعـنـوان: ${videoTitle}\n🎥 | الـدقـة: ${videoQuality}`,
-              attachment: fs.createReadStream(videoPath),
-            },
-            event.threadID
-          );
-          fs.unlinkSync(videoPath); // حذف الملف بعد الإرسال
-        });
+        const messageBody = `
+✧══════•❁◈❁•══════✧
+✺ ┇ ⏣ ⟬ تـم الـتـنـفـيـذ بـنـجـاح 🚀 ⟭
+✺ ┇ 
+✺ ┇ ◍ الـحـالـة: 『 جـاهـز لـلـعرض 』
+✺ ┇ ⸻⸻⸻⸻⸻
+✺ ┇ 🛡️ بـواسطة: بـانـدلـيـن سـيـستم
+✧══════•❁◈❁•══════✧`;
 
-        fileWriteStream.on("error", async (error) => {
-          console.error("[ERROR] أثناء كتابة الملف:", error);
-          await api.unsendMessage(downloadingMsg.messageID);
-          api.sendMessage("⚠️ | حدث خطأ أثناء تحميل الفيديو.", event.threadID);
-        });
-      } else {
-        await api.unsendMessage(downloadingMsg.messageID);
-        api.sendMessage("⚠️ | لا يوجد فيديو متاح للتنزيل.", event.threadID);
+        await api.sendMessage({
+            body: messageBody,
+            attachment: fs.createReadStream(videoPath)
+          }, event.threadID, (err) => {
+            // حذف الملف فوراً بعد الإرسال أو المحاولة
+            if (fs.existsSync(videoPath)) fs.unlinkSync(videoPath);
+          });
       }
     } catch (error) {
-      console.error("Error fetching or sending video:", error);
-      await api.unsendMessage(downloadingMsg.messageID);
-      api.sendMessage("⚠️ | حدث خطأ أثناء جلب أو إرسال الفيديو.", event.threadID);
+      console.error("Error:", error);
+      api.setMessageReaction("❌", event.messageID, () => {}, true);
     }
   }
 
   async events({ api, event }) {
-    const { body, threadID } = event;
+    const { body, type, senderID } = event;
+    if (senderID === api.getCurrentUserID() || !body) return;
+    if (type !== "message" && type !== "message_reply") return;
 
-    if (
-      body &&
-      /^(https?:\/\/)?(www\.)?(facebook\.com)\/.+$/.test(body)
-    ) {
-      // إذا أرسل المستخدم رابط فيسبوك صالح، يمكن تفعيل `execute` مباشرة
-      this.execute({ api, event });
+    // فلتر دقيق للروابط عشان ما يسحب أي نص عشوائي
+    const fbReg = /https?:\/\/(www\.)?(facebook\.com|fb\.watch|fb\.gg)\/[^\s]+/gi;
+    const ttReg = /https?:\/\/([a-zA-Z0-9-]+\.)?tiktok\.com\/[^\s]+/gi;
+
+    const fbMatch = body.match(fbReg);
+    const ttMatch = body.match(ttReg);
+
+    if (fbMatch) {
+      this.execute({ api, event, linkInput: fbMatch[0] });
+    } else if (ttMatch) {
+      this.execute({ api, event, linkInput: ttMatch[0] });
     }
   }
 }
 
-export default new VideoDownloader();
+export default new MultiDownloader();
