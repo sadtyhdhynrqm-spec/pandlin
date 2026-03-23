@@ -29,7 +29,7 @@ const listen = async ({ api, event }) => {
     const Economy = economyControllers({ api, event });
     const Exp = expControllers({ api, event });
 
-    if (["message", "message_reply", "message_reaction", "typ"].includes(type)) {
+    if (["message", "message_reply"].includes(type)) {
       if (isGroup) {
         await Thread.create(threadID);
       }

@@ -8,9 +8,9 @@ export default {
     options: {
         forceLogin: true,
         listenEvents: true,
-        listenTyping: true,
+        listenTyping: false,
         logLevel: "silent",
-        updatePresence: true,
+        updatePresence: false,
         selfListen: false,
         usedDatabase: false
     },
