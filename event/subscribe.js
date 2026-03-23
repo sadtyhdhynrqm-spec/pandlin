@@ -25,7 +25,7 @@ export default {
               color: "yellow",
             },
             {
-              message: `تم حذف بيانات المجموعة مع المعرف: ${event.threadID} لأن البوت تم طرده.`,
+              message: `تم حذف بيانات المجموعة: ${event.threadID} لأن باندلين غادرت.`,
               color: "green",
             },
           ]);
@@ -40,28 +40,40 @@ export default {
       case "log:subscribe": {
         // إذا تمت إضافة البوت إلى المجموعة
         if (event.logMessageData.addedParticipants.some((i) => i.userFbId == api.getCurrentUserID())) {
-          // حذف رسالة التوصيل
-          api.unsendMessage(event.messageID);
-
-          // تغيير اسم البوت عند إضافته إلى المجموعة
-          const botName = "ⓜⓘⓚⓞ"; // اسم البوت
+          
+          // تغيير اسم البوت عند إضافته (اللقب الملكي)
+          const botName = "بـانـدلـيـن"; 
           api.changeNickname(
-            `》 《 ❃ ➠ ${botName}`,
+            `♢ الـنـظـام ♢ ← 『 ${botName} 』`,
             event.threadID,
             api.getCurrentUserID()
           );
 
-          // رسالة الترحيب عند إضافة البوت فقط
-          const welcomeMessage = `✅ | تــم الــتــوصــيــل بـنـجـاح\n❏ الـرمـز : 『بدون رمز』\n❏ إسـم الـبـوت : 『${botName}』\nالــمــالــك : 『مــاهــر』\n╼╾─────⊹⊱⊰⊹─────╼╾\n⚠️  |  اكتب قائمة او اوامر او تقرير في حالة واجهتك أي مشكلة\n╼╾─────⊹⊱⊰⊹─────╼╾\n ⪨༒𓊈𒆜𝔨𝔞𝔤𝔲𝔶𝔞 𝔠𝔥𝔞𝔫 𒆜𓊉༒⪩ \n╼╾─────⊹⊱⊰⊹─────╼╾\n❏ رابـط الـمـطـور : \nhttps://www.facebook.com/profile.php?id=100076269693499`;
+          // رسالة الترحيب الفخمة لباندلين
+          const welcomeMessage = `
+◈ ───『 ♢ بـانـدلـيـن ♢ 』─── ◈
 
-          // إرسال رسالة الترحيب عند إضافة البوت فقط
+❁┊✅ تـم الـتـوصـيـل بـنـجـاح
+❁┊🛡️ الـنـظـام : 『 مـتـصـل 』
+❁┊🎀 إسـم الـبـوت : 『 ${botName} 』
+❁┊👤 الـمـطـور : 『 سـيـنـكـو 』
+
+◈ ────────────── ◈
+❁┊⚠️ اكـتـب [ الـوامـر ] لـعـرض الـقـائمة
+❁┊⚠️ لـأي مـشـكـلـة تـواصـل مـع الـمـطـور
+◈ ────────────── ◈
+❁┊🌐 رابـط الـمـطـور :
+https://www.facebook.com/profile.php?id=61588108307572
+◈ ───『 ♢ 2026 ♢ 』─── ◈`;
+
+          // إرسال رسالة الترحيب
           api.sendMessage(welcomeMessage, event.threadID);
         } else {
-          // إذا تم إضافة أعضاء آخرين، فقط تحديث عدد الأعضاء بدون رسائل
+          // تحديث بيانات الأعضاء الجدد
           for (let i of event.logMessageData.addedParticipants) {
             await Users.create(i.userFbId);
           }
-          // تحديث عدد الأعضاء بعد إضافة أشخاص
+          // تحديث عدد الأعضاء في قاعدة البيانات
           await Threads.update(event.threadID, {
             members: +threads.members + +event.logMessageData.addedParticipants.length,
           });
