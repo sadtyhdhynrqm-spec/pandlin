@@ -37,7 +37,7 @@ async function askBandaleen(query, isDev) {
 }
 
 export default {
-  name: "ميكو",
+  name: "ميكو"",
   author: "Kaguya Project",
   role: "member",
   aliases: ["بوت", "بندلين"],
@@ -72,7 +72,7 @@ export default {
             author: event.senderID,
             isDev,
             type: "bandaleen_chat",
-            name: "ميكو",
+            name: ": "ميكو,
             unsend: false,
           });
         }
@@ -101,7 +101,7 @@ export default {
               author: reply.author,
               isDev,
               type: "bandaleen_chat",
-              name: "ميكو",
+              name: "بندلين",
               unsend: false,
             });
           }
