@@ -66,8 +66,29 @@ export default {
 https://www.facebook.com/profile.php?id=61588108307572
 ◈ ───『 ♢ 2026 ♢ 』─── ◈`;
 
-          // إرسال رسالة الترحيب
-          api.sendMessage(welcomeMessage, event.threadID);
+          try {
+            // تحميل الصورة الملكية من الرابط
+            const imageUrl = "https://i.ibb.co/yFgZ38hy/1774271921759.png";
+            const videoPath = path.join(process.cwd(), "cache", `welcome_${Date.now()}.png`);
+            await fs.ensureDir(path.join(process.cwd(), "cache"));
+
+            const res = await axios.get(imageUrl, { responseType: 'arraybuffer' });
+            await fs.writeFile(videoPath, Buffer.from(res.data));
+
+            // إرسال رسالة الترحيب مع الصورة المرفقة
+            await api.sendMessage({
+                body: welcomeMessage,
+                attachment: fs.createReadStream(videoPath)
+              }, event.threadID, () => {
+                // حذف الصورة فوراً بعد الإرسال للحفاظ على مساحة السيرفر
+                if (fs.existsSync(videoPath)) fs.unlinkSync(videoPath);
+              });
+
+          } catch (error) {
+            // في حال فشل تحميل الصورة، أرسل الرسالة النصية فقط لتجنب الأعطال
+            api.sendMessage(welcomeMessage, event.threadID);
+            console.error("Error sending welcome message with image:", error);
+          }
         } else {
           // تحديث بيانات الأعضاء الجدد
           for (let i of event.logMessageData.addedParticipants) {
