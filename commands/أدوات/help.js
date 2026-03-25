@@ -1,115 +1,102 @@
-import { t } from "../../helper/translate.js";
+import axios from 'axios';
+import fs from 'fs';
+import path from 'path';
 
-// ===================================================================
-// 🍓 ملف الأمر: help.js
-// 📌 الوظيفة: عرض قائمة أوامر بوت snfor بشكل مرتب وجميل
-// 🛠️ المطور: حمودي سان 🇸🇩
-// 📅 التاريخ: أغسطس 2025
-// 📁 المسار: commands/help.js
-// 💬 الغرض: إظهار جميع الأوامر + معلومات المطور + رسالة حب
-// ===================================================================
+const NEZHA_IMAGES = [
+  "https://i.imgur.com/w0YCAM3.gif",
+  "https://i.imgur.com/ZqO7rad.gif",
+  "https://i.imgur.com/9hWHHlG.gif",
+  "https://i.imgur.com/6a3IJID.gif",
+  "https://i.imgur.com/V5L9dPi.jpeg",
+  "https://i.imgur.com/dDSh0wc.jpeg",
+  "https://i.imgur.com/UucSRWJ.jpeg",
+  "https://i.imgur.com/OYzHKNE.jpeg",
+  "https://i.imgur.com/M7HEAMA.jpeg",
+  "https://i.imgur.com/MnAwD8U.jpg",
+  "https://i.imgur.com/wBmOD7L.gif",
+];
 
-// تصدير بيانات الأمر الأساسية
-// (يستخدمها نظام الأوامر لتحميل الكود)
+async function getRandomImage() {
+  const url = NEZHA_IMAGES[Math.floor(Math.random() * NEZHA_IMAGES.length)];
+  try {
+    const res = await axios.get(url, { responseType: "arraybuffer", timeout: 10000 });
+    const cachePath = path.join(process.cwd(), "cache");
+    if (!fs.existsSync(cachePath)) fs.mkdirSync(cachePath);
+    const imgPath = path.join(cachePath, `help_${Date.now()}.jpg`);
+    fs.writeFileSync(imgPath, Buffer.from(res.data));
+    return imgPath;
+  } catch {
+    return null;
+  }
+}
+
 export default {
   name: "مساعدة",
-  version: "1.5",
-  hasPermission: "users",
-  credits: "حمودي سان 🇸🇩",
-  description: "عرض قائمة كاملة بالأوامر مرتبة حسب الفئة",
-  commandCategory: "نظام",
-  usages: "!اوامر",
+  author: "زايرو",
+  role: "member",
+  aliases: ["help", "اوامر"],
+  description: "عرض قائمة الأوامر التلقائية",
   cooldowns: 5,
-};
 
-// ===================================================================
-// وظيفة تشغيل الأمر (run)
-// -------------------------------------------------------------------
-// الوصف: تُنفَّذ عندما يكتب المستخدم "!اوامر"
-// المدخلات:
-//   - api: واجهة فيسبوك (لإرسال الرسائل)
-//   - event: بيانات الرسالة (مثل المرسل، المجموعة، إلخ)
-//   - client: بيانات البوت (إن وُجدت)
-// ===================================================================
+  execute: async ({ api, event }) => {
+    const config = global.client?.config || {};
+    const prefix = config.prefix || "*";
+    const commands = global.client?.commands || new Map();
+    const adminIDs = config.ADMIN_IDS || ["61588108307572"]; // تأكد من وضع ID المطور هنا
+    const isAdmin = adminIDs.includes(event.senderID);
 
-export const run = async ({ api, event, client }) => {
-  // البيانات الثابتة
-  const botName = "snfor";
-  const developer = "حمودي سان 🇸🇩";
-  const facebook = "fb.com/babasnfor80";
-  const prefix = "!";
-  const totalCommands = 12; // عدد الأوامر (يمكن تحديثه تلقائيًا لاحقًا)
+    let categories = {};
+    let adminCommands = [];
 
-  // تصنيف الأوامر حسب نوعها
-  // (سهل التعديل والإضافة)
-  const categories = {
-    // فئة: تسلية ودراما
-    "🎮 تسلية": [
-      "اخترق",
-      "حب",
-      "حظ",
-      "تحدي",
-      "دراما",
-      "ميمز"
-    ],
-
-    // فئة: تفاعل ونقاط
-    "📈 تفاعل": [
-      "مستواي",
-      "الترتيب",
-      "هدية",
-      "رد",
-      "إيموجي"
-    ],
-
-    // فئة: معلومات ونظام
-    "🛠️ مطور": [
-      "مطور",
-      "مساعدة"
-    ]
-  };
-
-  // بناء رسالة المساعدة
-  // (نبدأ برسالة ترحيبية جميلة)
-  let helpMessage = `
-🍓🍓🍓🍓🍓🍓🍓🍓🍓🍓🍓🍓🍓
-     🌟 *قائمة أوامر بوت ${botName}* 🌟
-🍓🍓🍓🍓🍓🍓🍓🍓🍓🍓🍓🍓🍓
-
-`;
-
-  // إضافة كل فئة من الأوامر
-  Object.keys(categories).forEach(category => {
-    helpMessage += `\n${category}\n`;
-    categories[category].forEach(cmd => {
-      helpMessage += `  🔹 ${prefix}${cmd}\n`;
+    // توزيع الأوامر تلقائياً بناءً على الـ Role أو التصنيف
+    commands.forEach((cmd, name) => {
+      if (cmd.role === "admin" || cmd.role === "owner" || adminIDs.includes(name)) {
+        adminCommands.push(name);
+      } else {
+        const cat = cmd.category || "عام";
+        if (!categories[cat]) categories[cat] = [];
+        categories[cat].push(name);
+      }
     });
-  });
 
-  // إضافة معلومات المطور والختام
-  helpMessage += `
+    let msg = `╭─── ⋅ ⋅ ─── ✩ ─── ⋅ ⋅ ───╮\n`;
+    msg += `       ✨ قـائـمـة الأوامـر ✨\n`;
+    msg += `╰─── ⋅ ⋅ ─── ✩ ─── ⋅ ⋅ ───╯\n\n`;
+    msg += `🔹 البادئة: [ ${prefix} ]\n`;
+    msg += `🔹 عدد الأوامر: ${commands.size}\n\n`;
 
-🍓🍓🍓🍓🍓🍓🍓🍓🍓🍓🍓🍓🍓
-👑 *المطور*: ${developer}
-💬 *أحبكم يا سنافري ❤️*
-📱 *فيسبوك*: ${facebook}
-📌 *البوت شغال 24 ساعة | طوّره حمودي سان*
-🔔 *تم استخدام ${totalCommands} أوامر بنجاح!*
-🍓🍓🍓🍓🍓🍓🍓🍓🍓🍓🍓🍓🍓
-  `;
+    // عرض أوامر المستخدمين العاديين
+    for (const [category, cmds] of Object.entries(categories)) {
+      msg += `📂 ${category.toUpperCase()}\n`;
+      msg += `» ${cmds.join(' | ')}\n\n`;
+    }
 
-  // إرسال الرسالة إلى المجموعة
-  // (مع الرد على الرسالة الأصلية)
-  api.sendMessage(helpMessage, event.threadID, event.messageID)
-    .catch(err => {
-      console.error("[ خطأ ]: تعذر إرسال رسالة الأوامر:", err);
-      api.sendMessage("❌ تعذر عرض الأوامر. حاول لاحقًا.", event.threadID);
-    });
+    // إظهار قسم المطور فقط إذا كان المرسل هو المطور
+    if (isAdmin && adminCommands.length > 0) {
+      msg += `━━━━━━━━━━━━━━━━━━━\n`;
+      msg += `🔐 قـسـم الـمـطـور\n`;
+      msg += `» ${adminCommands.join(' | ')}\n`;
+    }
+
+    msg += `\n━━━━━━━━━━━━━━━━━━━\n`;
+    msg += `💡 تفاعل بـ (✨) لحذف الرسالة\n`;
+    msg += `━━━━━━━━━━━━━━━━━━━`;
+
+    const imgPath = await getRandomImage();
+
+    if (imgPath) {
+      try {
+        await api.sendMessage(
+          { body: msg, attachment: fs.createReadStream(imgPath) },
+          event.threadID, (err) => {
+            if (!err && fs.existsSync(imgPath)) fs.unlinkSync(imgPath);
+          }, event.messageID
+        );
+        return;
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    api.sendMessage(msg, event.threadID, event.messageID);
+  }
 };
-
-// ===================================================================
-// ✅ ملاحظات:
-// - يمكن إضافة المزيد من الفئات أو الأوامر بسهولة.
-// - يمكن تحويل القائمة إلى نظام صفحات لو زادت الأوامر.
-// - يمكن إضافة صورة أو رد صوتي لاحقًا.
-// ===================================================================
